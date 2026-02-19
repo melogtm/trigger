@@ -7,10 +7,6 @@
 
 char *builtin_str[] = {"cd", "help", "exit"};
 
-/*
- * builtin_func is an array of pointers to functions that take a char** as an argument and return an int.
- * This is the devil.
- */
 int (*builtin_func[])(char **) = {&trigger_cd, &trigger_help, &trigger_exit};
 
 int trigger_num_builtins(void) {
@@ -21,7 +17,7 @@ int trigger_cd(char **args) {
     if (args[1] == NULL) {
         fprintf(stderr, "trigger: expected argument to \"cd\"\n");
     } else {
-        if (chdir(args[1]) != 0) {
+        if (chdir(args[1]) != EXIT_SUCCESS) {
             perror("trigger");
         }
     }
@@ -45,4 +41,3 @@ int trigger_help(char **args) {
 int trigger_exit(char **args) {
     return EXIT_SUCCESS;
 }
-

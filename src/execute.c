@@ -13,23 +13,16 @@ int trigger_launch(char **args) {
 
     const pid_t pid = fork();
 
-    if (pid == 0) {
-        // It is a child process
-        if (execvp(args[0], args) == -1) {
-            // A process cannot ever return from execvp if it is successful.
+    if (pid == CHILD_PROCESS_EXITED) {
+        if (execvp(args[0], args) == EXEC_RETURNED_FAILURE) {
             perror("trigger");
         }
         exit(EXIT_FAILURE);
     } else if (pid < 0) {
-        // Error forking
         perror("trigger");
     } else {
-        // It is a parent process
         do {
             waitpid(pid, &status, WUNTRACED);
-
-            // the macros WIF EXITED and WIF SIGNALED are used to check if the child process has exited or
-            // was terminated by a signal.
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
 
