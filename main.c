@@ -38,23 +38,25 @@ char * trigger_read_line(void) {
 char ** trigger_split_line(char * line) {
     int buffer_size = TRIGGER_TOK_BUFFER_SIZE, position = 0;
     char ** tokens = malloc(buffer_size * sizeof(char *));
-    char * token;
+    char *token = strtok(line, TRIGGER_TOK_DELIM);
 
     if (!tokens) {
         fprintf(stderr, "allocation error\n");
         exit(EXIT_FAILURE);
     }
 
-    token = strtok(line, TRIGGER_TOK_DELIM);
 
     while (token != NULL) {
         tokens[position++] = token;
 
         if (position >= buffer_size) {
             buffer_size += TRIGGER_TOK_BUFFER_SIZE;
-            tokens = realloc(tokens, buffer_size * sizeof(char *));
 
-            if (!tokens) {
+            char ** new_tokens = realloc(tokens, buffer_size * sizeof(char *));
+
+            if (new_tokens) {
+                tokens = new_tokens;
+            } else {
                 fprintf(stderr, "allocation error\n");
                 exit(EXIT_FAILURE);
             }
@@ -68,10 +70,9 @@ char ** trigger_split_line(char * line) {
 }
 
 int trigger_launch(char ** args) {
-    pid_t pid, wpid;
     int status;
 
-    pid = fork();
+    const pid_t pid = fork();
 
     if (pid == 0) {
         // It is a child process
@@ -86,8 +87,9 @@ int trigger_launch(char ** args) {
     } else {
         // It is a parent process
         do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-            // the macros WIFEXITED and WIFSIGNALED are used to check if the child process has exited or
+            waitpid(pid, &status, WUNTRACED);
+
+            // the macros WIF EXITED and WIF SIGNALED are used to check if the child process has exited or
             // was terminated by a signal.
         } while (!WIFEXITED(status) && !WIFSIGNALED(status));
     }
@@ -162,14 +164,12 @@ int trigger_execute(char ** args) {
 
 
 void trigger_loop() {
-    char* line;
-    char** args;
     int status;
 
     do {
         printf("> ");
-        line = trigger_read_line();
-        args = trigger_split_line(line);
+        char *line = trigger_read_line();
+        char **args = trigger_split_line(line);
         status = trigger_execute(args);
 
         free(line);
@@ -177,7 +177,7 @@ void trigger_loop() {
     } while (status);
 }
 
-int main(int argc, char **argv) {
+int main() {
     trigger_loop();
 
     return EXIT_SUCCESS;
