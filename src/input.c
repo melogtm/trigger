@@ -5,18 +5,9 @@
 
 char *trigger_read_line(void) {
     char *line = NULL;
-    /*
-     * Why buffer_size is equal to 0? Because getline will allocate a buffer for us if the line pointer
-     * is NULL and the buffer size is 0.
-     *
-     * If the buffer size is not 0, getline will try to read into the buffer and if the buffer is not large enough,
-     * it will return an error.
-     *
-     * Thank God humans invented getline.
-     */
-    size_t buffer_size = 0;
+    size_t buffer_size = TRIGGER_AUTOMATIC_BUFFER_SIZE;
 
-    if (getline(&line, &buffer_size, stdin) == -1) {
+    if (getline(&line, &buffer_size, stdin) == GETLINE_REACHED_END_OF_FILE_OR_ERROR) {
         if (feof(stdin)) {
             exit(EXIT_SUCCESS);
         }
