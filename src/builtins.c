@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "builtins.h"
-
-#define true 1
+#include "utils/utils.h"
 
 char *builtin_str[] = {"cd", "help", "exit"};
 
