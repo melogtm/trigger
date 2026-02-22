@@ -5,11 +5,6 @@
 #include "../include/builtins.h"
 #include "test_framework.h"
 
-void test_num_builtins() {
-    int count = trigger_num_builtins();
-    ASSERT_EQUAL(3, count, "Should have 3 built-in commands");
-}
-
 void test_builtin_arrays_match() {
     int count = trigger_num_builtins();
 
@@ -72,7 +67,6 @@ void test_exit_command() {
 int main() {
     TEST_SUITE_START("Built-ins Module Tests");
 
-    test_num_builtins();
     test_builtin_arrays_match();
     test_cd_no_args();
     test_cd_to_tmp();

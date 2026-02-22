@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include "input.h"
 #include "execute.h"
-
-#define true 1
+#include "utils/utils.h"
 
 void trigger_loop(void) {
     int status;
@@ -12,6 +11,13 @@ void trigger_loop(void) {
         printf("> ");
         char *line = trigger_read_line();
         char **args = trigger_split_line(line);
+
+        if (args == NULL) {
+            free(line);
+            status = true;
+            continue;
+        }
+
         status = trigger_execute(args);
 
         free(line);

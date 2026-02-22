@@ -5,8 +5,7 @@
 #include <unistd.h>
 #include "execute.h"
 #include "builtins.h"
-
-#define true 1
+#include "utils/utils.h"
 
 int trigger_launch(char **args) {
     int status;
@@ -18,7 +17,9 @@ int trigger_launch(char **args) {
             perror("trigger");
         }
         exit(EXIT_FAILURE);
-    } else if (pid < 0) {
+    }
+
+    if (pid < 0) {
         perror("trigger");
     } else {
         do {
@@ -30,7 +31,7 @@ int trigger_launch(char **args) {
 }
 
 int trigger_execute(char **args) {
-    if (args[0] == NULL) {
+    if (args == NULL || args[0] == NULL) {
         return true;
     }
 
