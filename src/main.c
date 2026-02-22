@@ -21,7 +21,7 @@ void trigger_loop(void) {
         status = trigger_execute(args);
 
         free(line);
-        free(args);
+        free_array_of_strings(args);
     } while (status);
 }
 

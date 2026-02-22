@@ -15,7 +15,7 @@ void test_split_line_basic() {
     ASSERT_STR_EQUAL("/home", tokens[2], "Third token should be '/home'");
     ASSERT_NULL(tokens[3], "Fourth token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -26,7 +26,7 @@ void test_split_line_empty() {
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL for empty input");
     ASSERT_NULL(tokens[0], "First token should be NULL for empty input");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -38,7 +38,7 @@ void test_split_line_single_command() {
     ASSERT_STR_EQUAL("pwd", tokens[0], "First token should be 'pwd'");
     ASSERT_NULL(tokens[1], "Second token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -52,7 +52,7 @@ void test_split_line_multiple_spaces() {
     ASSERT_STR_EQUAL("world", tokens[2], "Third token should be 'world'");
     ASSERT_NULL(tokens[3], "Fourth token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -66,7 +66,7 @@ void test_split_line_tabs() {
     ASSERT_STR_EQUAL("file2.txt", tokens[2], "Third token should be 'file2.txt'");
     ASSERT_NULL(tokens[3], "Fourth token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -81,7 +81,7 @@ void test_split_line_double_quotes_basic() {
     ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should be 'hello world' (with space preserved)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -94,7 +94,7 @@ void test_split_line_double_quotes_empty() {
     ASSERT_STR_EQUAL("", tokens[1], "Second token should be empty string");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -108,7 +108,7 @@ void test_split_line_double_quotes_multiple() {
     ASSERT_STR_EQUAL("world", tokens[2], "Third token should be 'world'");
     ASSERT_NULL(tokens[3], "Fourth token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -121,7 +121,7 @@ void test_split_line_double_quotes_with_tabs() {
     ASSERT_STR_EQUAL("hello\tworld", tokens[1], "Second token should preserve tab character");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -134,7 +134,7 @@ void test_split_line_double_quotes_concatenated() {
     ASSERT_STR_EQUAL("helloworldtest", tokens[1], "Second token should be 'helloworldtest' (concatenated)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -149,7 +149,7 @@ void test_split_line_single_quotes_basic() {
     ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should be 'hello world' (with space preserved)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -162,7 +162,7 @@ void test_split_line_single_quotes_empty() {
     ASSERT_STR_EQUAL("", tokens[1], "Second token should be empty string");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -175,7 +175,7 @@ void test_split_line_single_quotes_with_double_quotes() {
     ASSERT_STR_EQUAL("hello \"world\"", tokens[1], "Second token should preserve double quotes inside single quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -188,7 +188,7 @@ void test_split_line_single_quotes_concatenated() {
     ASSERT_STR_EQUAL("testhello worldend", tokens[1], "Second token should be concatenated");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -203,7 +203,7 @@ void test_split_line_backslash_space() {
     ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should be 'hello world' (escaped space)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -216,7 +216,7 @@ void test_split_line_backslash_multiple_spaces() {
     ASSERT_STR_EQUAL("hello  world", tokens[1], "Second token should have two spaces");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -229,7 +229,7 @@ void test_split_line_backslash_quote() {
     ASSERT_STR_EQUAL("\"hello\"", tokens[1], "Second token should contain literal quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -242,7 +242,7 @@ void test_split_line_backslash_single_quote() {
     ASSERT_STR_EQUAL("'hello'", tokens[1], "Second token should contain literal single quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -255,7 +255,7 @@ void test_split_line_backslash_backslash() {
     ASSERT_STR_EQUAL("\\test", tokens[1], "Second token should contain literal backslash");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -268,7 +268,7 @@ void test_split_line_backslash_tab() {
     ASSERT_STR_EQUAL("hello\tworld", tokens[1], "Second token should contain escaped tab");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -281,7 +281,7 @@ void test_split_line_backslash_newline() {
     ASSERT_STR_EQUAL("hello\nworld", tokens[1], "Second token should contain escaped newline");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -296,7 +296,7 @@ void test_split_line_mixed_quotes() {
     ASSERT_STR_EQUAL("hello 'world'", tokens[1], "Second token should preserve single quotes in double quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -309,7 +309,7 @@ void test_split_line_mixed_quotes_reversed() {
     ASSERT_STR_EQUAL("hello \"world\"", tokens[1], "Second token should preserve double quotes in single quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -322,7 +322,7 @@ void test_split_line_quotes_and_backslash() {
     ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should have escaped space in quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -338,7 +338,7 @@ void test_split_line_complex_mixed() {
     ASSERT_STR_EQUAL("arg 4", tokens[4], "Fifth token should be 'arg 4'");
     ASSERT_NULL(tokens[5], "Sixth token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -353,7 +353,7 @@ void test_split_line_adjacent_quotes() {
     ASSERT_STR_EQUAL("helloworld", tokens[1], "Second token should be 'helloworld'");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -366,7 +366,7 @@ void test_split_line_quote_at_start() {
     ASSERT_STR_EQUAL("hello", tokens[1], "Second token should be 'hello'");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -378,7 +378,7 @@ void test_split_line_only_quotes() {
     ASSERT_STR_EQUAL("", tokens[0], "First token should be empty string");
     ASSERT_NULL(tokens[1], "Second token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -391,7 +391,7 @@ void test_split_line_backslash_at_end() {
     ASSERT_STR_EQUAL("test", tokens[1], "Second token should be 'test' (trailing backslash ignored or handled)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -404,7 +404,7 @@ void test_split_line_special_characters_in_quotes() {
     ASSERT_STR_EQUAL("!@#$%^&*()", tokens[1], "Second token should preserve special characters");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -417,7 +417,7 @@ void test_split_line_path_with_spaces() {
     ASSERT_STR_EQUAL("/home/user/my documents", tokens[1], "Second token should preserve path with spaces");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 
@@ -430,7 +430,7 @@ void test_split_line_filename_with_escaped_spaces() {
     ASSERT_STR_EQUAL("my file name.txt", tokens[1], "Second token should be filename with spaces");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
-    free_tokens(tokens);
+    free_array_of_strings(tokens);
     free(line);
 }
 

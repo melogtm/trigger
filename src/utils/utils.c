@@ -2,14 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include "utils.h"
-#include "input.h"
 
-void free_tokens(char **tokens) {
-    if (tokens) {
-        for (int i = 0; tokens[i] != NULL; i++) {
-            free(tokens[i]);
+void free_array_of_strings(char **array) {
+    if (array) {
+        for (int i = 0; array[i] != NULL; i++) {
+            free(array[i]);
         }
-        free(tokens);
+        free(array);
     }
 }
 
@@ -160,14 +159,14 @@ char** parse_line_with_quotes(const char *line) {
     if (state == STATE_IN_SINGLE_QUOTE) {
         fprintf(stderr, "Error: Unclosed single quote\n");
         free(token_buffer);
-        free_tokens(tokens);
+        free_array_of_strings(tokens);
         return NULL;
     }
 
     if (state == STATE_IN_DOUBLE_QUOTE) {
         fprintf(stderr, "Error: Unclosed double quote\n");
         free(token_buffer);
-        free_tokens(tokens);
+        free_array_of_strings(tokens);
         return NULL;
     }
 

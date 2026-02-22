@@ -4,6 +4,8 @@
 #define true 1
 #define false 0
 
+#define TRIGGER_TOK_BUFFER_SIZE 64
+
 typedef enum {
     STATE_NORMAL,
     STATE_IN_SINGLE_QUOTE,
@@ -11,7 +13,7 @@ typedef enum {
     STATE_ESCAPED
 } ParserState;
 
-void free_tokens(char **tokens);
+void free_array_of_strings(char **array);
 
 int is_whitespace(char c);
 
