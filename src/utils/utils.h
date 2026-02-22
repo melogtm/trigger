@@ -11,13 +11,7 @@ typedef enum {
     STATE_ESCAPED
 } ParserState;
 
-typedef struct {
-    char **tokens;
-    int count;
-    int buffer_size;
-} ParseResult;
-
-void print_array_of_tokens(char** tokens);
+void free_tokens(char **tokens);
 
 int is_whitespace(char c);
 

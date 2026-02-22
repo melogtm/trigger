@@ -2,8 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include "utils.h"
+#include "input.h"
 
-#define TRIGGER_TOK_BUFFER_SIZE 64
+void free_tokens(char **tokens) {
+    if (tokens) {
+        for (int i = 0; tokens[i] != NULL; i++) {
+            free(tokens[i]);
+        }
+        free(tokens);
+    }
+}
 
 int is_whitespace(const char c) {
     return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\a';
@@ -152,14 +160,14 @@ char** parse_line_with_quotes(const char *line) {
     if (state == STATE_IN_SINGLE_QUOTE) {
         fprintf(stderr, "Error: Unclosed single quote\n");
         free(token_buffer);
-        free(tokens);
+        free_tokens(tokens);
         return NULL;
     }
 
     if (state == STATE_IN_DOUBLE_QUOTE) {
         fprintf(stderr, "Error: Unclosed double quote\n");
         free(token_buffer);
-        free(tokens);
+        free_tokens(tokens);
         return NULL;
     }
 
