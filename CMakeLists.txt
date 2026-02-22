@@ -9,25 +9,36 @@ set(LIB_SOURCES
         src/input.c
         src/execute.c
         src/builtins.c
+        src/input.c
+)
+
+set(UTIL_SOURCES
+        src/utils/utils.c
+        src/input.c
 )
 
 set(HEADERS
         include/input.h
         include/execute.h
         include/builtins.h
+        src/input.c
 )
 
-add_executable(shell src/main.c ${LIB_SOURCES} ${HEADERS})
+add_executable(shell src/main.c ${LIB_SOURCES} ${UTIL_SOURCES} ${HEADERS}
+        src/input.c)
 
 enable_testing()
 
-add_executable(test_input tests/test_input.c src/input.c)
+add_executable(test_input tests/test_input.c ${LIB_SOURCES} ${UTIL_SOURCES}
+        src/input.c)
 add_test(NAME InputTests COMMAND test_input)
 
-add_executable(test_builtins tests/test_builtins.c src/builtins.c)
+add_executable(test_builtins tests/test_builtins.c src/builtins.c src/input.c ${UTIL_SOURCES}
+        src/input.c)
 add_test(NAME BuiltinsTests COMMAND test_builtins)
 
-add_executable(test_execute tests/test_execute.c src/execute.c src/builtins.c)
+add_executable(test_execute tests/test_execute.c src/execute.c src/builtins.c src/input.c ${UTIL_SOURCES}
+        src/input.c)
 add_test(NAME ExecuteTests COMMAND test_execute)
 
 add_custom_target(run_tests
