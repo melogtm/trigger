@@ -10,17 +10,20 @@ void trigger_loop(void) {
     do {
         printf("> ");
         char *line = trigger_read_line();
-        char **args = trigger_split_line(line);
+        int *glob_eligible = NULL;
+        char **args = trigger_split_line_ex(line, &glob_eligible);
 
         if (args == NULL) {
             free(line);
+            free(glob_eligible);
             status = true;
             continue;
         }
 
-        status = trigger_execute(args);
+        status = trigger_execute(&args, &glob_eligible);
 
         free(line);
+        free(glob_eligible);
         free_array_of_strings(args);
     } while (status);
 }

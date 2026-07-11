@@ -32,7 +32,8 @@ void add_char_to_token(char **token_buffer, int *token_pos, int *token_size, con
 }
 
 void finalize_token(char ***tokens_ptr, int *position, int *buffer_size,
-                    char **token_buffer, int *token_pos, int *token_size, int force) {
+                    char **token_buffer, int *token_pos, int *token_size, int force,
+                    int **out_glob_eligible, int glob_eligible) {
     if (*token_pos > 0 || force) {
         char **tokens = *tokens_ptr;
 
@@ -49,9 +50,25 @@ void finalize_token(char ***tokens_ptr, int *position, int *buffer_size,
 
             tokens = new_tokens;
             *tokens_ptr = tokens;
+
+            if (out_glob_eligible != NULL) {
+                int *new_glob = realloc(*out_glob_eligible, *buffer_size * sizeof(int));
+
+                if (!new_glob) {
+                    fprintf(stderr, "allocation error\n");
+                    exit(EXIT_FAILURE);
+                }
+
+                *out_glob_eligible = new_glob;
+            }
         }
 
         tokens[*position] = strdup(*token_buffer);
+
+        if (out_glob_eligible != NULL) {
+            (*out_glob_eligible)[*position] = glob_eligible;
+        }
+
         (*position)++;
 
         *token_pos = 0;
@@ -61,7 +78,8 @@ void finalize_token(char ***tokens_ptr, int *position, int *buffer_size,
 static void process_character(const char c, const char next_c, ParserState *state,
                              char **token_buffer, int *token_pos, int *token_size,
                              char ***tokens_ptr, int *position, int *buffer_size,
-                             int *skip_next) {
+                             int *skip_next, int *glob_eligible,
+                             int **out_glob_eligible) {
     *skip_next = 0;
 
     switch (*state) {
@@ -74,7 +92,9 @@ static void process_character(const char c, const char next_c, ParserState *stat
                 *state = STATE_IN_DOUBLE_QUOTE;
             } else if (is_whitespace(c)) {
                 finalize_token(tokens_ptr, position, buffer_size,
-                               token_buffer, token_pos, token_size, false);
+                               token_buffer, token_pos, token_size, false,
+                               out_glob_eligible, *glob_eligible);
+                *glob_eligible = 1;
             } else {
                 add_char_to_token(token_buffer, token_pos, token_size, c);
             }
@@ -82,6 +102,7 @@ static void process_character(const char c, const char next_c, ParserState *stat
 
         case STATE_ESCAPED:
             add_char_to_token(token_buffer, token_pos, token_size, c);
+            *glob_eligible = 0;
             *state = STATE_NORMAL;
             break;
 
@@ -90,10 +111,13 @@ static void process_character(const char c, const char next_c, ParserState *stat
                 *state = STATE_NORMAL;
                 if (next_c == '\0' || is_whitespace(next_c)) {
                     finalize_token(tokens_ptr, position, buffer_size,
-                                 token_buffer, token_pos, token_size, true);
+                                 token_buffer, token_pos, token_size, true,
+                                 out_glob_eligible, *glob_eligible);
+                    *glob_eligible = 1;
                 }
             } else {
                 add_char_to_token(token_buffer, token_pos, token_size, c);
+                *glob_eligible = 0;
             }
             break;
 
@@ -102,23 +126,28 @@ static void process_character(const char c, const char next_c, ParserState *stat
                 *state = STATE_NORMAL;
                 if (next_c == '\0' || is_whitespace(next_c)) {
                     finalize_token(tokens_ptr, position, buffer_size,
-                                 token_buffer, token_pos, token_size, true);
+                                 token_buffer, token_pos, token_size, true,
+                                 out_glob_eligible, *glob_eligible);
+                    *glob_eligible = 1;
                 }
             } else if (c == '\\' && next_c != '\0') {
                 if (next_c == '"' || next_c == '\\' || next_c == '$' || next_c == ' ') {
                     add_char_to_token(token_buffer, token_pos, token_size, next_c);
+                    *glob_eligible = 0;
                     *skip_next = true;
                 } else {
                     add_char_to_token(token_buffer, token_pos, token_size, c);
+                    *glob_eligible = 0;
                 }
             } else {
                 add_char_to_token(token_buffer, token_pos, token_size, c);
+                *glob_eligible = 0;
             }
             break;
     }
 }
 
-char** parse_line_with_quotes(const char *line) {
+char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
 
     int buffer_size = TRIGGER_TOK_BUFFER_SIZE;
     int position = 0;
@@ -127,6 +156,19 @@ char** parse_line_with_quotes(const char *line) {
     if (!tokens) {
         fprintf(stderr, "allocation error\n");
         exit(EXIT_FAILURE);
+    }
+
+    int *glob_eligible_arr = NULL;
+
+    if (out_glob_eligible != NULL) {
+        glob_eligible_arr = malloc(buffer_size * sizeof(int));
+
+        if (!glob_eligible_arr) {
+            fprintf(stderr, "allocation error\n");
+            exit(EXIT_FAILURE);
+        }
+
+        *out_glob_eligible = glob_eligible_arr;
     }
 
     int token_size = 128;
@@ -139,6 +181,8 @@ char** parse_line_with_quotes(const char *line) {
     }
 
     ParserState state = STATE_NORMAL;
+    int glob_eligible = 1;
+    int **pc_out_glob = (out_glob_eligible != NULL) ? &glob_eligible_arr : NULL;
     int i = 0;
 
     while (line[i] != '\0') {
@@ -148,7 +192,7 @@ char** parse_line_with_quotes(const char *line) {
         process_character(line[i], next_char, &state,
                          &token_buffer, &token_pos, &token_size,
                          &tokens, &position, &buffer_size,
-                         &skip_next);
+                         &skip_next, &glob_eligible, pc_out_glob);
 
         if (skip_next) {
             i++;
@@ -160,6 +204,12 @@ char** parse_line_with_quotes(const char *line) {
         fprintf(stderr, "Error: Unclosed single quote\n");
         free(token_buffer);
         free_array_of_strings(tokens);
+        free(glob_eligible_arr);
+
+        if (out_glob_eligible != NULL) {
+            *out_glob_eligible = NULL;
+        }
+
         return NULL;
     }
 
@@ -167,13 +217,26 @@ char** parse_line_with_quotes(const char *line) {
         fprintf(stderr, "Error: Unclosed double quote\n");
         free(token_buffer);
         free_array_of_strings(tokens);
+        free(glob_eligible_arr);
+
+        if (out_glob_eligible != NULL) {
+            *out_glob_eligible = NULL;
+        }
+
         return NULL;
     }
 
     finalize_token(&tokens, &position, &buffer_size,
-                   &token_buffer, &token_pos, &token_size, false);
+                   &token_buffer, &token_pos, &token_size, false,
+                   pc_out_glob, glob_eligible);
 
     tokens[position] = NULL;
+
+    if (out_glob_eligible != NULL) {
+        *out_glob_eligible = glob_eligible_arr;
+    } else {
+        free(glob_eligible_arr);
+    }
 
     free(token_buffer);
 
