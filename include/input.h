@@ -1,10 +1,6 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#define TRIGGER_AUTOMATIC_BUFFER_SIZE 0
-#define GET_LINE_REACHED_END_OF_FILE_OR_ERROR (-1)
-#define TRIGGER_TOK_DELIM " \t\r\n\a"
-
 char *trigger_read_line(void);
 char **trigger_split_line(const char *line);
 char **trigger_split_line_ex(const char *line, int **out_glob_eligible);

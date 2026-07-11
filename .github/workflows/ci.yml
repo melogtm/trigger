@@ -17,6 +17,22 @@ jobs:
       - name: Build and test
         run: ./run_tests.sh
 
+  sanitize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cmake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+      - name: Build and test with sanitizers
+        env:
+          ASAN_OPTIONS: detect_leaks=1
+        run: |
+          cmake -B cmake-build-debug -S . -DTRIGGER_SANITIZE=ON
+          cmake --build cmake-build-debug
+          cd cmake-build-debug && ctest --output-on-failure
+
   lint:
     runs-on: ubuntu-latest
     steps:
