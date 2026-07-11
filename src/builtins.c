@@ -5,10 +5,11 @@
 #include <string.h>
 #include <unistd.h>
 
-static const Builtin builtins[] = {{"cd", trigger_cd},          {"help", trigger_help},
-                                   {"exit", trigger_exit},      {"pwd", trigger_pwd},
-                                   {"echo", trigger_echo},      {"export", trigger_export},
-                                   {"unset", trigger_unset}};
+static const Builtin builtins[] = {
+    {"cd", trigger_cd},      {"help", trigger_help},    {"exit", trigger_exit},
+    {"pwd", trigger_pwd},    {"echo", trigger_echo},    {"export", trigger_export},
+    {"unset", trigger_unset},
+};
 
 static const int builtin_count = sizeof(builtins) / sizeof(builtins[0]);
 
@@ -55,7 +56,7 @@ int trigger_exit(char **args) {
         char *endptr;
         long n = strtol(args[1], &endptr, 10);
         if (*endptr == '\0' && n >= 0 && n <= 255) {
-            return (int)n;
+            return (int) n;
         }
         fprintf(stderr, "trigger: exit: %s: numeric argument required\n", args[1]);
         return 2;

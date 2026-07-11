@@ -1,8 +1,9 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
 
-#include "utils/utils.h"
 #include <stdbool.h>
+
+typedef struct TokenList TokenList;
 
 typedef struct {
     int status;

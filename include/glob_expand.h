@@ -1,7 +1,7 @@
 #ifndef GLOB_EXPAND_H
 #define GLOB_EXPAND_H
 
-#include "utils/utils.h"
+typedef struct TokenList TokenList;
 
 void expand_globs(TokenList *tl);
 
