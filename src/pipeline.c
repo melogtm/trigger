@@ -57,11 +57,9 @@ static void argv_grow(char ***argv, size_t *cap, size_t count) {
 
 PipelineStage *trigger_parse_pipeline(char **tokens, const int *glob_eligible, int *num_stages) {
     int stage_count = 1;
-    int total_tokens = 0;
     int error = 0;
 
     for (int i = 0; tokens[i] != NULL; i++) {
-        total_tokens++;
         if (is_operator_token(tokens[i], glob_eligible, i) &&
             classify_operator(tokens[i]) == OP_PIPE) {
             stage_count++;
