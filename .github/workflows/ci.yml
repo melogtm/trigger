@@ -11,7 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install cmake
-        run: sudo apt-get install -y cmake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
       - name: Build and test
         run: ./run_tests.sh
 
