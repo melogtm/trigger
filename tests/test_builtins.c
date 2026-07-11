@@ -36,17 +36,17 @@ void test_cd_to_tmp() {
     char cwd_before[1024];
     char cwd_after[1024];
 
-    getcwd(cwd_before, sizeof(cwd_before));
+    ASSERT_NOT_NULL(getcwd(cwd_before, sizeof(cwd_before)), "getcwd before");
 
     char *args[] = {"cd", "/tmp", NULL};
     int result = trigger_cd(args);
 
-    getcwd(cwd_after, sizeof(cwd_after));
+    ASSERT_NOT_NULL(getcwd(cwd_after, sizeof(cwd_after)), "getcwd after");
 
     ASSERT_EQUAL(0, result, "cd to /tmp should return 0");
     ASSERT_STR_EQUAL("/tmp", cwd_after, "Should be in /tmp directory");
 
-    chdir(cwd_before);
+    ASSERT_EQUAL(0, chdir(cwd_before), "chdir back");
 }
 
 void test_help_command() {
@@ -74,13 +74,13 @@ void test_pwd_command() {
     char *args[] = {"pwd", NULL};
 
     char cwd_before[4096];
-    getcwd(cwd_before, sizeof(cwd_before));
+    ASSERT_NOT_NULL(getcwd(cwd_before, sizeof(cwd_before)), "getcwd before");
 
     int result = trigger_pwd(args);
     ASSERT_EQUAL(0, result, "pwd should return 0");
 
     char cwd_after[4096];
-    getcwd(cwd_after, sizeof(cwd_after));
+    ASSERT_NOT_NULL(getcwd(cwd_after, sizeof(cwd_after)), "getcwd after");
     ASSERT_STR_EQUAL(cwd_before, cwd_after, "pwd should not change current directory");
 }
 
