@@ -10,40 +10,26 @@ void test_builtin_arrays_match() {
 
     ASSERT_TRUE(count == 7, "Should have 7 built-in commands");
 
-    int found_cd = 0, found_help = 0, found_exit = 0;
-    int found_pwd = 0, found_echo = 0, found_export = 0, found_unset = 0;
-    for (int i = 0; i < count; i++) {
-        if (strcmp(builtin_str[i], "cd") == 0)
-            found_cd = 1;
-        if (strcmp(builtin_str[i], "help") == 0)
-            found_help = 1;
-        if (strcmp(builtin_str[i], "exit") == 0)
-            found_exit = 1;
-        if (strcmp(builtin_str[i], "pwd") == 0)
-            found_pwd = 1;
-        if (strcmp(builtin_str[i], "echo") == 0)
-            found_echo = 1;
-        if (strcmp(builtin_str[i], "export") == 0)
-            found_export = 1;
-        if (strcmp(builtin_str[i], "unset") == 0)
-            found_unset = 1;
-    }
+    ASSERT_NOT_NULL(find_builtin("cd"), "Should find 'cd' built-in");
+    ASSERT_NOT_NULL(find_builtin("help"), "Should find 'help' built-in");
+    ASSERT_NOT_NULL(find_builtin("exit"), "Should find 'exit' built-in");
+    ASSERT_NOT_NULL(find_builtin("pwd"), "Should find 'pwd' built-in");
+    ASSERT_NOT_NULL(find_builtin("echo"), "Should find 'echo' built-in");
+    ASSERT_NOT_NULL(find_builtin("export"), "Should find 'export' built-in");
+    ASSERT_NOT_NULL(find_builtin("unset"), "Should find 'unset' built-in");
 
-    ASSERT_TRUE(found_cd, "Should have 'cd' built-in");
-    ASSERT_TRUE(found_help, "Should have 'help' built-in");
-    ASSERT_TRUE(found_exit, "Should have 'exit' built-in");
-    ASSERT_TRUE(found_pwd, "Should have 'pwd' built-in");
-    ASSERT_TRUE(found_echo, "Should have 'echo' built-in");
-    ASSERT_TRUE(found_export, "Should have 'export' built-in");
-    ASSERT_TRUE(found_unset, "Should have 'unset' built-in");
+    ASSERT_NULL(find_builtin("nonexistent"), "Should not find unknown built-in");
+
+    const Builtin *cd_b = find_builtin("cd");
+    ASSERT_NOT_NULL(cd_b, "cd Builtin* should not be NULL");
+    ASSERT_TRUE(cd_b->fn == trigger_cd, "cd Builtin should point to trigger_cd");
 }
 
 void test_cd_no_args() {
     char *args[] = {"cd", NULL};
     int result = trigger_cd(args);
 
-    // Should return true (1) even when no directory provided
-    ASSERT_TRUE(result, "cd with no args should return true");
+    ASSERT_EQUAL(1, result, "cd with no args should return 1 (error)");
 }
 
 void test_cd_to_tmp() {
@@ -57,10 +43,9 @@ void test_cd_to_tmp() {
 
     getcwd(cwd_after, sizeof(cwd_after));
 
-    ASSERT_TRUE(result, "cd to /tmp should return true");
+    ASSERT_EQUAL(0, result, "cd to /tmp should return 0");
     ASSERT_STR_EQUAL("/tmp", cwd_after, "Should be in /tmp directory");
 
-    // Restore original directory
     chdir(cwd_before);
 }
 
@@ -68,7 +53,7 @@ void test_help_command() {
     char *args[] = {"help", NULL};
     int result = trigger_help(args);
 
-    ASSERT_TRUE(result, "help command should return true");
+    ASSERT_EQUAL(0, result, "help command should return 0");
 }
 
 void test_exit_command() {
@@ -78,6 +63,13 @@ void test_exit_command() {
     ASSERT_EQUAL(EXIT_SUCCESS, result, "exit command should return EXIT_SUCCESS");
 }
 
+void test_exit_with_code() {
+    char *args[] = {"exit", "3", NULL};
+    int result = trigger_exit(args);
+
+    ASSERT_EQUAL(3, result, "exit 3 should return 3");
+}
+
 void test_pwd_command() {
     char *args[] = {"pwd", NULL};
 
@@ -85,7 +77,7 @@ void test_pwd_command() {
     getcwd(cwd_before, sizeof(cwd_before));
 
     int result = trigger_pwd(args);
-    ASSERT_TRUE(result, "pwd should return true");
+    ASSERT_EQUAL(0, result, "pwd should return 0");
 
     char cwd_after[4096];
     getcwd(cwd_after, sizeof(cwd_after));
@@ -95,19 +87,19 @@ void test_pwd_command() {
 void test_echo_command() {
     char *args[] = {"echo", "hello", "world", NULL};
     int result = trigger_echo(args);
-    ASSERT_TRUE(result, "echo should return true");
+    ASSERT_EQUAL(0, result, "echo should return 0");
 }
 
 void test_echo_empty() {
     char *args[] = {"echo", NULL};
     int result = trigger_echo(args);
-    ASSERT_TRUE(result, "echo with no args should return true");
+    ASSERT_EQUAL(0, result, "echo with no args should return 0");
 }
 
 void test_export_command() {
     char *args[] = {"export", "TEST_VAR=hello", NULL};
     int result = trigger_export(args);
-    ASSERT_TRUE(result, "export should return true");
+    ASSERT_EQUAL(0, result, "export should return 0");
     ASSERT_STR_EQUAL("hello", getenv("TEST_VAR"), "exported variable should be available");
     unsetenv("TEST_VAR");
 }
@@ -115,14 +107,14 @@ void test_export_command() {
 void test_export_no_value() {
     char *args[] = {"export", "NOVAL", NULL};
     int result = trigger_export(args);
-    ASSERT_TRUE(result, "export of invalid format should still return true");
+    ASSERT_EQUAL(0, result, "export of invalid format should still return 0");
 }
 
 void test_unset_command() {
     setenv("UNSET_VAR", "test_value", 1);
     char *args[] = {"unset", "UNSET_VAR", NULL};
     int result = trigger_unset(args);
-    ASSERT_TRUE(result, "unset should return true");
+    ASSERT_EQUAL(0, result, "unset should return 0");
     ASSERT_NULL(getenv("UNSET_VAR"), "unset variable should not be available");
 }
 
@@ -134,6 +126,7 @@ int main() {
     test_cd_to_tmp();
     test_help_command();
     test_exit_command();
+    test_exit_with_code();
     test_pwd_command();
     test_echo_command();
     test_echo_empty();

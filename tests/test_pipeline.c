@@ -10,41 +10,27 @@
 #include <string.h>
 #include <unistd.h>
 
-static char **make_tokens(const char *input) {
-    extern char **parse_line_with_quotes(const char *line, int **out_glob_eligible);
-    return parse_line_with_quotes(input, NULL);
-}
+static TokenList *make_tokenlist(const char *input) { return parse_line_with_quotes(input); }
 
 static void free_parse_result(PipelineStage *stages, int num_stages) {
-    for (int i = 0; i < num_stages; i++) {
-        free(stages[i].infile);
-        free(stages[i].outfile);
-        if (stages[i].argv != NULL) {
-            free_array_of_strings(stages[i].argv);
-        }
-    }
-    free(stages);
+    trigger_free_pipeline(stages, num_stages);
 }
 
 static int run_command(const char *input) {
-    int *glob_eligible = NULL;
-    char **args = trigger_split_line_ex(input, &glob_eligible);
-    ASSERT_NOT_NULL(args, input);
-    int result = trigger_execute(&args, &glob_eligible);
-    free(glob_eligible);
-    if (args != NULL) {
-        free_array_of_strings(args);
-    }
-    return result;
+    TokenList *tl = parse_line_with_quotes(input);
+    ASSERT_NOT_NULL(tl, input);
+    ExecuteResult r = trigger_execute(tl);
+    token_list_free(tl);
+    return r.status == 0;
 }
 
 void test_parse_simple_pipe() {
-    char **tokens = make_tokens("ls | grep src");
-    ASSERT_NOT_NULL(tokens, "tokens should not be NULL");
+    TokenList *tl = make_tokenlist("ls | grep src");
+    ASSERT_NOT_NULL(tl, "tokens should not be NULL");
 
     int num_stages = 0;
-    PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
-    free(tokens);
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
 
     ASSERT_EQUAL(2, num_stages, "should have 2 stages");
     ASSERT_STR_EQUAL("ls", stages[0].argv[0], "first stage command is ls");
@@ -57,12 +43,12 @@ void test_parse_simple_pipe() {
 }
 
 void test_parse_redirect_out() {
-    char **tokens = make_tokens("echo hello > /tmp/out.txt");
-    ASSERT_NOT_NULL(tokens, "tokens should not be NULL");
+    TokenList *tl = make_tokenlist("echo hello > /tmp/out.txt");
+    ASSERT_NOT_NULL(tl, "tokens should not be NULL");
 
     int num_stages = 0;
-    PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
-    free(tokens);
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
 
     ASSERT_EQUAL(1, num_stages, "should have 1 stage");
     ASSERT_STR_EQUAL("echo", stages[0].argv[0], "command is echo");
@@ -76,12 +62,12 @@ void test_parse_redirect_out() {
 }
 
 void test_parse_redirect_append() {
-    char **tokens = make_tokens("echo hello >> /tmp/out.txt");
-    ASSERT_NOT_NULL(tokens, "tokens should not be NULL");
+    TokenList *tl = make_tokenlist("echo hello >> /tmp/out.txt");
+    ASSERT_NOT_NULL(tl, "TokenList should not be NULL");
 
     int num_stages = 0;
-    PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
-    free(tokens);
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
 
     ASSERT_EQUAL(1, num_stages, "should have 1 stage");
     ASSERT_STR_EQUAL("/tmp/out.txt", stages[0].outfile, "outfile is /tmp/out.txt");
@@ -91,12 +77,12 @@ void test_parse_redirect_append() {
 }
 
 void test_parse_redirect_in() {
-    char **tokens = make_tokens("wc -l < /tmp/input.txt");
-    ASSERT_NOT_NULL(tokens, "tokens should not be NULL");
+    TokenList *tl = make_tokenlist("wc -l < /tmp/input.txt");
+    ASSERT_NOT_NULL(tl, "TokenList should not be NULL");
 
     int num_stages = 0;
-    PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
-    free(tokens);
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
 
     ASSERT_EQUAL(1, num_stages, "should have 1 stage");
     ASSERT_STR_EQUAL("wc", stages[0].argv[0], "command is wc");
@@ -109,12 +95,12 @@ void test_parse_redirect_in() {
 }
 
 void test_parse_pipe_with_redirect() {
-    char **tokens = make_tokens("cat < /etc/hostname | wc -c > /tmp/count.txt");
-    ASSERT_NOT_NULL(tokens, "tokens should not be NULL");
+    TokenList *tl = make_tokenlist("cat < /etc/hostname | wc -c > /tmp/count.txt");
+    ASSERT_NOT_NULL(tl, "TokenList should not be NULL");
 
     int num_stages = 0;
-    PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
-    free(tokens);
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
 
     ASSERT_EQUAL(2, num_stages, "should have 2 stages");
     ASSERT_STR_EQUAL("cat", stages[0].argv[0], "first stage: cat");
@@ -204,6 +190,51 @@ void test_quoted_redirect_not_operator() {
     ASSERT_TRUE(result, "echo of quoted > should not be parsed as redirect");
 }
 
+void test_parse_redirect_missing_filename() {
+    TokenList *tl = make_tokenlist("cmd >");
+    ASSERT_NOT_NULL(tl, "TokenList should not be NULL");
+
+    int num_stages = 0;
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
+
+    ASSERT_NULL(stages, "parse should return NULL on missing filename");
+    ASSERT_EQUAL(0, num_stages, "num_stages should be 0 on syntax error");
+}
+
+void test_parse_redirect_no_arg_pipe() {
+    TokenList *tl = make_tokenlist("cmd > | next");
+    ASSERT_NOT_NULL(tl, "TokenList should not be NULL");
+
+    int num_stages = 0;
+    PipelineStage *stages = trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
+    token_list_free(tl);
+
+    ASSERT_NULL(stages, "parse should return NULL on >| syntax error");
+    ASSERT_EQUAL(0, num_stages, "num_stages should be 0 on error");
+}
+
+void test_quoted_pipe_split_correctly() {
+    int *glob_eligible = NULL;
+    char **args = trigger_split_line_ex("/bin/echo \"|\" | /bin/cat", &glob_eligible);
+    ASSERT_NOT_NULL(args, "args should not be NULL");
+
+    int num_stages = 0;
+    PipelineStage *stages = trigger_parse_pipeline(args, glob_eligible, &num_stages);
+    free(args);
+    free(glob_eligible);
+
+    ASSERT_NOT_NULL(stages, "parse should succeed");
+    ASSERT_EQUAL(2, num_stages, "should have 2 stages: echo with literal pipe | cat");
+    ASSERT_STR_EQUAL("/bin/echo", stages[0].argv[0], "first stage cmd: echo");
+    ASSERT_STR_EQUAL("|", stages[0].argv[1], "first stage arg: literal |");
+    ASSERT_NULL(stages[0].argv[2], "first stage has 2 tokens");
+    ASSERT_STR_EQUAL("/bin/cat", stages[1].argv[0], "second stage cmd: cat");
+    ASSERT_NULL(stages[1].argv[1], "second stage has 1 token");
+
+    trigger_free_pipeline(stages, num_stages);
+}
+
 int main() {
     TEST_SUITE_START("Pipeline Tests");
 
@@ -219,6 +250,9 @@ int main() {
     test_e2e_builtin_in_pipeline();
     test_quoted_pipe_not_operator();
     test_quoted_redirect_not_operator();
+    test_parse_redirect_missing_filename();
+    test_parse_redirect_no_arg_pipe();
+    test_quoted_pipe_split_correctly();
 
     TEST_SUITE_END();
 }

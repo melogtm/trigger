@@ -1,10 +1,16 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#define true 1
-#define false 0
+#include <stdbool.h>
+#include <stddef.h>
 
 #define TRIGGER_TOK_BUFFER_SIZE 64
+
+typedef struct TokenList {
+    char **argv;
+    int *glob_eligible;
+    size_t count;
+} TokenList;
 
 typedef enum {
     STATE_NORMAL,
@@ -13,16 +19,13 @@ typedef enum {
     STATE_ESCAPED
 } ParserState;
 
+void *xmalloc(size_t size);
+void *xrealloc(void *ptr, size_t size);
+char *xstrdup(const char *s);
+
 void free_array_of_strings(char **array);
+void token_list_free(TokenList *tl);
 
-int is_whitespace(char c);
-
-void add_char_to_token(char **token_buffer, int *token_pos, int *token_size, char c);
-
-void finalize_token(char ***tokens_ptr, int *position, int *buffer_size, char **token_buffer,
-                    int *token_pos, int *token_size, int force, int **out_glob_eligible,
-                    int glob_eligible);
-
-char **parse_line_with_quotes(const char *line, int **out_glob_eligible);
+TokenList *parse_line_with_quotes(const char *line);
 
 #endif

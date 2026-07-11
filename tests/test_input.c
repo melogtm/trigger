@@ -443,6 +443,58 @@ void test_split_line_filename_with_escaped_spaces() {
     free(line);
 }
 
+void test_split_line_long_token(void) {
+    char *long_str = malloc(10001);
+    ASSERT_NOT_NULL(long_str, "malloc should succeed");
+    memset(long_str, 'x', 10000);
+    long_str[10000] = '\0';
+
+    char *line = malloc(10006);
+    ASSERT_NOT_NULL(line, "malloc should succeed");
+    strcpy(line, "echo ");
+    strcat(line, long_str);
+
+    char **tokens = trigger_split_line(line);
+    ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
+    ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
+    ASSERT_STR_EQUAL(long_str, tokens[1], "Second token should be 10k x chars");
+    ASSERT_NULL(tokens[2], "Third token should be NULL");
+
+    free_array_of_strings(tokens);
+    free(line);
+    free(long_str);
+}
+
+void test_split_line_many_tokens(void) {
+    size_t buf_size = 1;
+    char *line = malloc(buf_size);
+    ASSERT_NOT_NULL(line, "malloc should succeed");
+    line[0] = '\0';
+
+    for (int i = 0; i < 200; i++) {
+        char chunk[16];
+        snprintf(chunk, sizeof(chunk), " t%d", i);
+        buf_size += strlen(chunk);
+        line = realloc(line, buf_size);
+        ASSERT_NOT_NULL(line, "realloc should succeed");
+        strcat(line, chunk);
+    }
+
+    char **tokens = trigger_split_line(line);
+    ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
+
+    ASSERT_STR_EQUAL("t0", tokens[0], "First token should be 't0'");
+
+    int count = 0;
+    while (tokens[count] != NULL)
+        count++;
+    ASSERT_TRUE(count >= 199, "should have at least 199 tokens");
+    ASSERT_NULL(tokens[count], "Last should be NULL");
+
+    free_array_of_strings(tokens);
+    free(line);
+}
+
 int main() {
     TEST_SUITE_START("Input Module Tests");
 
@@ -489,6 +541,8 @@ int main() {
     test_split_line_special_characters_in_quotes();
     test_split_line_path_with_spaces();
     test_split_line_filename_with_escaped_spaces();
+    test_split_line_long_token();
+    test_split_line_many_tokens();
 
     TEST_SUITE_END();
 }

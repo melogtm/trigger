@@ -1,10 +1,16 @@
 #ifndef EXECUTE_H
 #define EXECUTE_H
 
-#define CHILD_PROCESS_EXITED 0
-#define EXEC_RETURNED_FAILURE (-1)
+#include <stdbool.h>
+
+typedef struct TokenList TokenList;
+
+typedef struct {
+    int status;
+    bool should_exit;
+} ExecuteResult;
 
 int trigger_launch(char **args);
-int trigger_execute(char ***args_ptr, int **glob_eligible_ptr);
+ExecuteResult trigger_execute(TokenList *tl);
 
 #endif

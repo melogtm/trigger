@@ -1,35 +1,43 @@
 #include "execute.h"
 #include "input.h"
 #include "utils/utils.h"
+#include <signal.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 void trigger_loop(void) {
-    int status;
+    int last_status = 0;
 
-    do {
+    for (;;) {
         printf("> ");
         fflush(stdout);
         char *line = trigger_read_line();
-        int *glob_eligible = NULL;
-        char **args = trigger_split_line_ex(line, &glob_eligible);
+        TokenList *tl = parse_line_with_quotes(line);
 
-        if (args == NULL) {
+        if (tl == NULL) {
             free(line);
-            free(glob_eligible);
-            status = true;
             continue;
         }
 
-        status = trigger_execute(&args, &glob_eligible);
+        ExecuteResult r = trigger_execute(tl);
+        last_status = r.status;
 
         free(line);
-        free(glob_eligible);
-        free_array_of_strings(args);
-    } while (status);
+        token_list_free(tl);
+
+        if (r.should_exit) {
+            break;
+        }
+    }
+
+    exit(last_status);
 }
 
 int main(void) {
+    signal(SIGINT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);
+
     trigger_loop();
 
     return EXIT_SUCCESS;
