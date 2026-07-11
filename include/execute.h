@@ -8,4 +8,3 @@ int trigger_launch(char **args);
 int trigger_execute(char ***args_ptr, int **glob_eligible_ptr);
 
 #endif
-

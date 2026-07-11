@@ -1,8 +1,8 @@
+#include "execute.h"
+#include "input.h"
+#include "utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "input.h"
-#include "execute.h"
-#include "utils/utils.h"
 
 void trigger_loop(void) {
     int status;

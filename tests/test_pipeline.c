@@ -1,14 +1,14 @@
+#include "../include/builtins.h"
+#include "../include/execute.h"
+#include "../include/input.h"
+#include "../include/pipeline.h"
+#include "../src/utils/utils.h"
+#include "test_framework.h"
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include "../include/pipeline.h"
-#include "../include/execute.h"
-#include "../include/input.h"
-#include "../include/builtins.h"
-#include "../src/utils/utils.h"
-#include "test_framework.h"
 
 static char **make_tokens(const char *input) {
     extern char **parse_line_with_quotes(const char *line, int **out_glob_eligible);

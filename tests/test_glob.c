@@ -1,21 +1,31 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/stat.h>
 #include "../include/glob_expand.h"
 #include "../include/input.h"
 #include "../include/pipeline.h"
 #include "../src/utils/utils.h"
 #include "test_framework.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 static void setup_fixture() {
     mkdir("/tmp/trigger_glob_test", 0755);
-    FILE *f = fopen("/tmp/trigger_glob_test/a.txt", "w"); if (f) fclose(f);
-    f = fopen("/tmp/trigger_glob_test/b.txt", "w"); if (f) fclose(f);
-    f = fopen("/tmp/trigger_glob_test/c.md", "w"); if (f) fclose(f);
-    f = fopen("/tmp/trigger_glob_test/d.dat", "w"); if (f) fclose(f);
-    f = fopen("/tmp/trigger_glob_test/ax.txt", "w"); if (f) fclose(f);
+    FILE *f = fopen("/tmp/trigger_glob_test/a.txt", "w");
+    if (f)
+        fclose(f);
+    f = fopen("/tmp/trigger_glob_test/b.txt", "w");
+    if (f)
+        fclose(f);
+    f = fopen("/tmp/trigger_glob_test/c.md", "w");
+    if (f)
+        fclose(f);
+    f = fopen("/tmp/trigger_glob_test/d.dat", "w");
+    if (f)
+        fclose(f);
+    f = fopen("/tmp/trigger_glob_test/ax.txt", "w");
+    if (f)
+        fclose(f);
 }
 
 static void teardown_fixture() {
@@ -40,14 +50,18 @@ void test_glob_txt_files() {
     char **expanded = expand_globs(args, &glob_eligible);
 
     int count = 0;
-    while (expanded[count] != NULL) count++;
+    while (expanded[count] != NULL)
+        count++;
     ASSERT_EQUAL(4, count, "should have 4 entries: echo + a.txt + b.txt + ax.txt");
 
     int found_a = 0, found_b = 0, found_ax = 0;
     for (int i = 0; expanded[i] != NULL; i++) {
-        if (strstr(expanded[i], "a.txt")) found_a = 1;
-        if (strstr(expanded[i], "b.txt")) found_b = 1;
-        if (strstr(expanded[i], "ax.txt")) found_ax = 1;
+        if (strstr(expanded[i], "a.txt"))
+            found_a = 1;
+        if (strstr(expanded[i], "b.txt"))
+            found_b = 1;
+        if (strstr(expanded[i], "ax.txt"))
+            found_ax = 1;
     }
     ASSERT_TRUE(found_a, "should have a.txt in expansion");
     ASSERT_TRUE(found_b, "should have b.txt in expansion");
@@ -85,7 +99,8 @@ void test_no_match_pattern() {
     setup_fixture();
 
     int *glob_eligible = NULL;
-    char **args = trigger_split_line_ex("echo /tmp/trigger_glob_test/*.nonexistent", &glob_eligible);
+    char **args =
+        trigger_split_line_ex("echo /tmp/trigger_glob_test/*.nonexistent", &glob_eligible);
     ASSERT_NOT_NULL(args, "args should not be NULL");
 
     char **expanded = expand_globs(args, &glob_eligible);
@@ -154,7 +169,8 @@ void test_glob_eligible_after_expansion() {
     char **expanded = expand_globs(args, &glob_eligible);
 
     int count = 0;
-    while (expanded[count] != NULL) count++;
+    while (expanded[count] != NULL)
+        count++;
     ASSERT_EQUAL(4, count, "should have 4 entries");
 
     ASSERT_TRUE(glob_eligible[0], "echo should keep original eligibility=1");
@@ -172,14 +188,14 @@ void test_glob_with_pipe_operator() {
     setup_fixture();
 
     int *glob_eligible = NULL;
-    char **args = trigger_split_line_ex(
-        "echo /tmp/trigger_glob_test/*.txt | wc x", &glob_eligible);
+    char **args = trigger_split_line_ex("echo /tmp/trigger_glob_test/*.txt | wc x", &glob_eligible);
     ASSERT_NOT_NULL(args, "args should not be NULL");
 
     char **expanded = expand_globs(args, &glob_eligible);
 
     int count = 0;
-    while (expanded[count] != NULL) count++;
+    while (expanded[count] != NULL)
+        count++;
 
     ASSERT_EQUAL(7, count, "should have 7 entries: echo a b ax | wc x");
 

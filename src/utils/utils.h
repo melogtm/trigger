@@ -19,11 +19,10 @@ int is_whitespace(char c);
 
 void add_char_to_token(char **token_buffer, int *token_pos, int *token_size, char c);
 
-void finalize_token(char ***tokens_ptr, int *position, int *buffer_size,
-                    char **token_buffer, int *token_pos, int *token_size, int force,
-                    int **out_glob_eligible, int glob_eligible);
+void finalize_token(char ***tokens_ptr, int *position, int *buffer_size, char **token_buffer,
+                    int *token_pos, int *token_size, int force, int **out_glob_eligible,
+                    int glob_eligible);
 
-char** parse_line_with_quotes(const char *line, int **out_glob_eligible);
+char **parse_line_with_quotes(const char *line, int **out_glob_eligible);
 
 #endif
-

@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <unistd.h>
 #include "execute.h"
 #include "builtins.h"
 #include "glob_expand.h"
 #include "pipeline.h"
 #include "utils/utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int trigger_launch(char **args) {
     int status;
@@ -34,7 +34,6 @@ int trigger_launch(char **args) {
 
 int trigger_execute(char ***args_ptr, int **glob_eligible_ptr) {
     char **args = *args_ptr;
-    int *glob_eligible = (glob_eligible_ptr != NULL) ? *glob_eligible_ptr : NULL;
 
     if (args == NULL || args[0] == NULL) {
         return true;
@@ -42,14 +41,14 @@ int trigger_execute(char ***args_ptr, int **glob_eligible_ptr) {
 
     args = expand_globs(args, glob_eligible_ptr);
     *args_ptr = args;
-    glob_eligible = (glob_eligible_ptr != NULL) ? *glob_eligible_ptr : NULL;
+    int *glob_eligible = (glob_eligible_ptr != NULL) ? *glob_eligible_ptr : NULL;
 
     int has_operator = 0;
 
     for (int i = 0; args[i] != NULL; i++) {
         if (glob_eligible == NULL || glob_eligible[i]) {
-            if (strcmp(args[i], "|") == 0 || strcmp(args[i], "<") == 0
-                || strcmp(args[i], ">") == 0 || strcmp(args[i], ">>") == 0) {
+            if (strcmp(args[i], "|") == 0 || strcmp(args[i], "<") == 0 ||
+                strcmp(args[i], ">") == 0 || strcmp(args[i], ">>") == 0) {
                 has_operator = 1;
                 break;
             }

@@ -1,13 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <sys/wait.h>
-#include <unistd.h>
 #include "pipeline.h"
 #include "builtins.h"
 #include "execute.h"
 #include "utils/utils.h"
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 PipelineStage *trigger_parse_pipeline(char **tokens, int *num_stages) {
     int stage_count = 1;
@@ -45,20 +45,18 @@ PipelineStage *trigger_parse_pipeline(char **tokens, int *num_stages) {
 
         while (tokens[j] != NULL && strcmp(tokens[j], "|") != 0) {
             if (strcmp(tokens[j], "<") == 0) {
-                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0
-                    && strcmp(tokens[j + 1], "<") != 0
-                    && strcmp(tokens[j + 1], ">") != 0
-                    && strcmp(tokens[j + 1], ">>") != 0) {
+                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0 &&
+                    strcmp(tokens[j + 1], "<") != 0 && strcmp(tokens[j + 1], ">") != 0 &&
+                    strcmp(tokens[j + 1], ">>") != 0) {
                     infile_val = tokens[j + 1];
                     j++;
                 } else {
                     fprintf(stderr, "trigger: syntax error: expected filename after '<'\n");
                 }
             } else if (strcmp(tokens[j], ">") == 0) {
-                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0
-                    && strcmp(tokens[j + 1], "<") != 0
-                    && strcmp(tokens[j + 1], ">") != 0
-                    && strcmp(tokens[j + 1], ">>") != 0) {
+                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0 &&
+                    strcmp(tokens[j + 1], "<") != 0 && strcmp(tokens[j + 1], ">") != 0 &&
+                    strcmp(tokens[j + 1], ">>") != 0) {
                     outfile_val = tokens[j + 1];
                     outfile_append = 0;
                     j++;
@@ -66,10 +64,9 @@ PipelineStage *trigger_parse_pipeline(char **tokens, int *num_stages) {
                     fprintf(stderr, "trigger: syntax error: expected filename after '>'\n");
                 }
             } else if (strcmp(tokens[j], ">>") == 0) {
-                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0
-                    && strcmp(tokens[j + 1], "<") != 0
-                    && strcmp(tokens[j + 1], ">") != 0
-                    && strcmp(tokens[j + 1], ">>") != 0) {
+                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0 &&
+                    strcmp(tokens[j + 1], "<") != 0 && strcmp(tokens[j + 1], ">") != 0 &&
+                    strcmp(tokens[j + 1], ">>") != 0) {
                     outfile_val = tokens[j + 1];
                     outfile_append = 1;
                     j++;
@@ -95,24 +92,21 @@ PipelineStage *trigger_parse_pipeline(char **tokens, int *num_stages) {
 
         while (tokens[j] != NULL && strcmp(tokens[j], "|") != 0) {
             if (strcmp(tokens[j], "<") == 0) {
-                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0
-                    && strcmp(tokens[j + 1], "<") != 0
-                    && strcmp(tokens[j + 1], ">") != 0
-                    && strcmp(tokens[j + 1], ">>") != 0) {
+                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0 &&
+                    strcmp(tokens[j + 1], "<") != 0 && strcmp(tokens[j + 1], ">") != 0 &&
+                    strcmp(tokens[j + 1], ">>") != 0) {
                     j++;
                 }
             } else if (strcmp(tokens[j], ">") == 0) {
-                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0
-                    && strcmp(tokens[j + 1], "<") != 0
-                    && strcmp(tokens[j + 1], ">") != 0
-                    && strcmp(tokens[j + 1], ">>") != 0) {
+                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0 &&
+                    strcmp(tokens[j + 1], "<") != 0 && strcmp(tokens[j + 1], ">") != 0 &&
+                    strcmp(tokens[j + 1], ">>") != 0) {
                     j++;
                 }
             } else if (strcmp(tokens[j], ">>") == 0) {
-                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0
-                    && strcmp(tokens[j + 1], "<") != 0
-                    && strcmp(tokens[j + 1], ">") != 0
-                    && strcmp(tokens[j + 1], ">>") != 0) {
+                if (tokens[j + 1] != NULL && strcmp(tokens[j + 1], "|") != 0 &&
+                    strcmp(tokens[j + 1], "<") != 0 && strcmp(tokens[j + 1], ">") != 0 &&
+                    strcmp(tokens[j + 1], ">>") != 0) {
                     j++;
                 }
             } else {
@@ -243,7 +237,7 @@ int trigger_execute_pipeline(PipelineStage *stages, int num_stages) {
     int *pipe_fds = NULL;
 
     if (pipe_count > 0) {
-        pipe_fds = malloc(2 * pipe_count * sizeof(int));
+        pipe_fds = malloc((unsigned long) (2 * pipe_count) * sizeof(int));
 
         if (pipe_fds == NULL) {
             fprintf(stderr, "allocation error\n");
@@ -251,12 +245,12 @@ int trigger_execute_pipeline(PipelineStage *stages, int num_stages) {
         }
 
         for (int i = 0; i < pipe_count; i++) {
-            if (pipe(pipe_fds + 2 * i) < 0) {
+            if (pipe(pipe_fds + (2 * i)) < 0) {
                 perror("trigger");
 
                 for (int j = 0; j < i; j++) {
                     close(pipe_fds[2 * j]);
-                    close(pipe_fds[2 * j + 1]);
+                    close(pipe_fds[(2 * j) + 1]);
                 }
 
                 free(pipe_fds);
@@ -297,7 +291,7 @@ int trigger_execute_pipeline(PipelineStage *stages, int num_stages) {
             }
 
             if (i < num_stages - 1) {
-                dup2(pipe_fds[2 * i + 1], STDOUT_FILENO);
+                dup2(pipe_fds[(2 * i) + 1], STDOUT_FILENO);
             } else if (stages[i].outfile != NULL) {
                 int flags = O_WRONLY | O_CREAT;
 
