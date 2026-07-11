@@ -1,16 +1,28 @@
-name : Release
+name: Release
 
-           on : push : tags : -'v*.*.*'
+on:
+  push:
+    tags:
+      - 'v*.*.*'
 
-                              permissions : contents : write
+permissions:
+  contents: write
 
-                                                           jobs : release
-    : runs -
-      on : ubuntu - latest steps : -uses : actions / checkout @v4 -
-           name : Install cmake run : |
-                                      sudo apt - get update sudo apt - get install - y cmake -
-                                          name : Build(Release) run
-    : |
-      cmake - B build - S.- DCMAKE_BUILD_TYPE =
-    Release cmake-- build build-- target shell - name : Create release uses : softprops / action
-    - gh - release @v2 with : files : build / shell generate_release_notes : true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cmake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+      - name: Build (Release)
+        run: |
+          cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --target shell
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/shell
+          generate_release_notes: true
