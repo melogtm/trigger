@@ -21,9 +21,22 @@ char *trigger_read_line(void) {
 }
 
 char **trigger_split_line(const char *line) {
-    char** tokens = parse_line_with_quotes(line);
+    char** tokens = parse_line_with_quotes(line, NULL);
 
     if (tokens == NULL) {
+        return NULL;
+    }
+
+    return tokens;
+}
+
+char **trigger_split_line_ex(const char *line, int **out_glob_eligible) {
+    char** tokens = parse_line_with_quotes(line, out_glob_eligible);
+
+    if (tokens == NULL) {
+        if (out_glob_eligible != NULL) {
+            *out_glob_eligible = NULL;
+        }
         return NULL;
     }
 
