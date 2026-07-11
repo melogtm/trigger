@@ -130,9 +130,6 @@ PipelineStage *trigger_parse_pipeline(char **tokens, const int *glob_eligible, i
                 free(stages[k].argv);
             }
             free(stages);
-            for (int t = 0; t < total_tokens; t++) {
-                free(tokens[t]);
-            }
             *num_stages = 0;
             return NULL;
         }
@@ -148,10 +145,6 @@ PipelineStage *trigger_parse_pipeline(char **tokens, const int *glob_eligible, i
         }
         stage_start = j;
         si++;
-    }
-
-    for (int i = 0; i < total_tokens; i++) {
-        free(tokens[i]);
     }
 
     *num_stages = stage_count;
