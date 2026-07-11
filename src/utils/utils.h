@@ -6,7 +6,7 @@
 
 #define TRIGGER_TOK_BUFFER_SIZE 64
 
-typedef struct {
+typedef struct TokenList {
     char **argv;
     int *glob_eligible;
     size_t count;

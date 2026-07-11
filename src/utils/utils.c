@@ -70,6 +70,7 @@ static void add_char_to_token(char **token_buffer, size_t *token_pos,
 static void finalize_token(char ***tokens_ptr, size_t *position, size_t *buffer_size,
                            char **token_buffer, size_t *token_pos, size_t *token_size, int force,
                            int **out_glob_eligible, int glob_eligible) {
+    (void)token_size;
     if (*token_pos > 0 || force) {
         char **tokens = *tokens_ptr;
 
