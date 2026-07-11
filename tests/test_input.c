@@ -449,7 +449,7 @@ void test_split_line_long_token(void) {
     memset(long_str, 'x', 10000);
     long_str[10000] = '\0';
 
-    char *line = malloc(10004);
+    char *line = malloc(10006);
     ASSERT_NOT_NULL(line, "malloc should succeed");
     strcpy(line, "echo ");
     strcat(line, long_str);

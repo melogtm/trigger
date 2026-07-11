@@ -44,7 +44,10 @@ void free_array_of_strings(char **array) {
 
 void token_list_free(TokenList *tl) {
     if (tl) {
-        free_array_of_strings(tl->argv);
+        for (size_t i = 0; i < tl->count; i++) {
+            free(tl->argv[i]);
+        }
+        free(tl->argv);
         free(tl->glob_eligible);
         free(tl);
     }

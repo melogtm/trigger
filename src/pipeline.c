@@ -117,17 +117,24 @@ PipelineStage *trigger_parse_pipeline(char **tokens, const int *glob_eligible, i
                     outfile_val = tokens[j + 1];
                     outfile_append = (op == OP_REDIR_APPEND);
                 }
+                free(tokens[j]);
+                tokens[j] = NULL;
                 j += 2;
             } else {
+                free(tokens[j]);
+                tokens[j] = NULL;
                 j++;
             }
         }
 
         if (error) {
+            for (size_t i = 0; i < ai; i++) {
+                free(argv[i]);
+            }
             free(argv);
             int k;
             for (k = 0; k < si; k++) {
-                free(stages[k].argv);
+                free_array_of_strings(stages[k].argv);
             }
             free(stages);
             *num_stages = 0;
@@ -140,7 +147,18 @@ PipelineStage *trigger_parse_pipeline(char **tokens, const int *glob_eligible, i
         stages[si].outfile = outfile_val;
         stages[si].append = outfile_append;
 
+        for (int t = 0; t < j; t++) {
+            if (tokens[t] == infile_val) {
+                tokens[t] = NULL;
+            }
+            if (tokens[t] == outfile_val) {
+                tokens[t] = NULL;
+            }
+        }
+
         if (tokens[j] != NULL) {
+            free(tokens[j]);
+            tokens[j] = NULL;
             j++;
         }
         stage_start = j;

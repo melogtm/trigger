@@ -53,7 +53,7 @@ static TokenList *make_tl(const char *line) {
 }
 
 static void free_tl(TokenList *tl) {
-    free(tl->argv);
+    free_array_of_strings(tl->argv);
     free(tl->glob_eligible);
     free(tl);
 }
