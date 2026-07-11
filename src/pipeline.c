@@ -89,9 +89,8 @@ PipelineStage *trigger_parse_pipeline(char **tokens, const int *glob_eligible, i
 
         int j = stage_start;
 
-        while (tokens[j] != NULL &&
-               !(is_operator_token(tokens[j], glob_eligible, j) &&
-                 classify_operator(tokens[j]) == OP_PIPE)) {
+        while (tokens[j] != NULL && !(is_operator_token(tokens[j], glob_eligible, j) &&
+                                      classify_operator(tokens[j]) == OP_PIPE)) {
 
             if (!is_operator_token(tokens[j], glob_eligible, j)) {
                 argv_grow(&argv, &argv_cap, ai);
@@ -290,7 +289,7 @@ PipelineResult trigger_execute_pipeline(PipelineStage *stages, int num_stages) {
     int *pipe_fds = NULL;
 
     if (pipe_count > 0) {
-        pipe_fds = xmalloc((unsigned long)(2 * pipe_count) * sizeof(int));
+        pipe_fds = xmalloc((unsigned long) (2 * pipe_count) * sizeof(int));
 
         for (int i = 0; i < pipe_count; i++) {
             if (pipe(pipe_fds + (2 * i)) < 0) {
@@ -340,8 +339,7 @@ PipelineResult trigger_execute_pipeline(PipelineStage *stages, int num_stages) {
                     _exit(EXIT_FAILURE);
                 }
             } else {
-                int redir_err = apply_redirection(
-                    0, NULL, stages[i].outfile, stages[i].append);
+                int redir_err = apply_redirection(0, NULL, stages[i].outfile, stages[i].append);
                 if (redir_err != 0) {
                     _exit(EXIT_FAILURE);
                 }

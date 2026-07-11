@@ -6,12 +6,8 @@
 #include <unistd.h>
 
 static const Builtin builtins[] = {
-    {"cd", trigger_cd},
-    {"help", trigger_help},
-    {"exit", trigger_exit},
-    {"pwd", trigger_pwd},
-    {"echo", trigger_echo},
-    {"export", trigger_export},
+    {"cd", trigger_cd},       {"help", trigger_help}, {"exit", trigger_exit},
+    {"pwd", trigger_pwd},     {"echo", trigger_echo}, {"export", trigger_export},
     {"unset", trigger_unset},
 };
 
