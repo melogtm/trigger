@@ -57,8 +57,8 @@ static int is_whitespace(char c) {
     return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\a';
 }
 
-static void add_char_to_token(char **token_buffer, size_t *token_pos,
-                              size_t *token_size, char c) {
+static void
+add_char_to_token(char **token_buffer, size_t *token_pos, size_t *token_size, char c) {
     if (*token_pos >= *token_size - 1) {
         if (*token_size > SIZE_MAX / 2) {
             fprintf(stderr, "allocation error\n");
@@ -71,9 +71,9 @@ static void add_char_to_token(char **token_buffer, size_t *token_pos,
 }
 
 static void finalize_token(char ***tokens_ptr, size_t *position, size_t *buffer_size,
-                           char **token_buffer, size_t *token_pos, size_t *token_size, int force,
+                           char **token_buffer, size_t *token_pos,
+                           size_t *token_size __attribute__((unused)), int force,
                            int **out_glob_eligible, int glob_eligible) {
-    (void)token_size;
     if (*token_pos > 0 || force) {
         char **tokens = *tokens_ptr;
 
@@ -89,8 +89,8 @@ static void finalize_token(char ***tokens_ptr, size_t *position, size_t *buffer_
             *tokens_ptr = tokens;
 
             if (out_glob_eligible != NULL) {
-                *out_glob_eligible = xrealloc(*out_glob_eligible,
-                                               *buffer_size * sizeof(int));
+                *out_glob_eligible =
+                    xrealloc(*out_glob_eligible, *buffer_size * sizeof(int));
             }
         }
 

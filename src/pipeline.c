@@ -340,8 +340,8 @@ PipelineResult trigger_execute_pipeline(PipelineStage *stages, int num_stages) {
                     _exit(EXIT_FAILURE);
                 }
             } else {
-                int redir_err = apply_redirection(0, NULL, stages[i].outfile,
-                                                  stages[i].append);
+                int redir_err = apply_redirection(
+                    0, NULL, stages[i].outfile, stages[i].append);
                 if (redir_err != 0) {
                     _exit(EXIT_FAILURE);
                 }

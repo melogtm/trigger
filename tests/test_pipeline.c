@@ -10,9 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 
-static TokenList *make_tokenlist(const char *input) {
-    return parse_line_with_quotes(input);
-}
+static TokenList *make_tokenlist(const char *input) { return parse_line_with_quotes(input); }
 
 static void free_parse_result(PipelineStage *stages, int num_stages) {
     trigger_free_pipeline(stages, num_stages);

@@ -6,8 +6,12 @@
 #include <unistd.h>
 
 static const Builtin builtins[] = {
-    {"cd", trigger_cd},      {"help", trigger_help},    {"exit", trigger_exit},
-    {"pwd", trigger_pwd},    {"echo", trigger_echo},    {"export", trigger_export},
+    {"cd", trigger_cd},
+    {"help", trigger_help},
+    {"exit", trigger_exit},
+    {"pwd", trigger_pwd},
+    {"echo", trigger_echo},
+    {"export", trigger_export},
     {"unset", trigger_unset},
 };
 
@@ -37,8 +41,7 @@ int trigger_cd(char **args) {
     return 0;
 }
 
-int trigger_help(char **args) {
-    (void)args;
+int trigger_help(char **args __attribute__((unused))) {
     printf("Trigger: A simple shell written in C\n");
     printf("Type program names and arguments, and hit enter.\n");
     printf("The following are built in:\n");
@@ -64,8 +67,7 @@ int trigger_exit(char **args) {
     return EXIT_SUCCESS;
 }
 
-int trigger_pwd(char **args) {
-    (void)args;
+int trigger_pwd(char **args __attribute__((unused))) {
     char *cwd = getcwd(NULL, 0);
 
     if (cwd == NULL) {

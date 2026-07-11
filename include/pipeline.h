@@ -3,13 +3,7 @@
 
 #define FILE_MODE 0644
 
-typedef enum {
-    OP_NONE,
-    OP_PIPE,
-    OP_REDIR_IN,
-    OP_REDIR_OUT,
-    OP_REDIR_APPEND
-} Operator;
+typedef enum { OP_NONE, OP_PIPE, OP_REDIR_IN, OP_REDIR_OUT, OP_REDIR_APPEND } Operator;
 
 typedef struct {
     char **argv;

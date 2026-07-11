@@ -74,8 +74,8 @@ ExecuteResult trigger_execute(TokenList *tl) {
 
     if (has_operator) {
         int num_stages = 0;
-        PipelineStage *stages = trigger_parse_pipeline(
-            tl->argv, tl->glob_eligible, &num_stages);
+        PipelineStage *stages =
+            trigger_parse_pipeline(tl->argv, tl->glob_eligible, &num_stages);
 
         if (stages == NULL) {
             result.status = 1;
