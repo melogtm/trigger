@@ -9,6 +9,7 @@ void trigger_loop(void) {
 
     do {
         printf("> ");
+        fflush(stdout);
         char *line = trigger_read_line();
         int *glob_eligible = NULL;
         char **args = trigger_split_line_ex(line, &glob_eligible);

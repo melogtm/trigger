@@ -44,6 +44,7 @@ void test_parse_simple_pipe() {
 
     int num_stages = 0;
     PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
+    free(tokens);
 
     ASSERT_EQUAL(2, num_stages, "should have 2 stages");
     ASSERT_STR_EQUAL("ls", stages[0].argv[0], "first stage command is ls");
@@ -61,6 +62,7 @@ void test_parse_redirect_out() {
 
     int num_stages = 0;
     PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
+    free(tokens);
 
     ASSERT_EQUAL(1, num_stages, "should have 1 stage");
     ASSERT_STR_EQUAL("echo", stages[0].argv[0], "command is echo");
@@ -79,6 +81,7 @@ void test_parse_redirect_append() {
 
     int num_stages = 0;
     PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
+    free(tokens);
 
     ASSERT_EQUAL(1, num_stages, "should have 1 stage");
     ASSERT_STR_EQUAL("/tmp/out.txt", stages[0].outfile, "outfile is /tmp/out.txt");
@@ -93,6 +96,7 @@ void test_parse_redirect_in() {
 
     int num_stages = 0;
     PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
+    free(tokens);
 
     ASSERT_EQUAL(1, num_stages, "should have 1 stage");
     ASSERT_STR_EQUAL("wc", stages[0].argv[0], "command is wc");
@@ -110,6 +114,7 @@ void test_parse_pipe_with_redirect() {
 
     int num_stages = 0;
     PipelineStage *stages = trigger_parse_pipeline(tokens, &num_stages);
+    free(tokens);
 
     ASSERT_EQUAL(2, num_stages, "should have 2 stages");
     ASSERT_STR_EQUAL("cat", stages[0].argv[0], "first stage: cat");

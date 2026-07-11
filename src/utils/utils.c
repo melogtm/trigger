@@ -203,6 +203,7 @@ char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
     if (state == STATE_IN_SINGLE_QUOTE) {
         fprintf(stderr, "Error: Unclosed single quote\n");
         free(token_buffer);
+        tokens[position] = NULL;
         free_array_of_strings(tokens);
         free(glob_eligible_arr);
 
@@ -216,6 +217,7 @@ char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
     if (state == STATE_IN_DOUBLE_QUOTE) {
         fprintf(stderr, "Error: Unclosed double quote\n");
         free(token_buffer);
+        tokens[position] = NULL;
         free_array_of_strings(tokens);
         free(glob_eligible_arr);
 
@@ -229,6 +231,18 @@ char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
     finalize_token(&tokens, &position, &buffer_size,
                    &token_buffer, &token_pos, &token_size, false,
                    pc_out_glob, glob_eligible);
+
+    if (position >= buffer_size) {
+        buffer_size += TRIGGER_TOK_BUFFER_SIZE;
+        char **new_tokens = realloc(tokens, buffer_size * sizeof(char *));
+
+        if (!new_tokens) {
+            fprintf(stderr, "allocation error\n");
+            exit(EXIT_FAILURE);
+        }
+
+        tokens = new_tokens;
+    }
 
     tokens[position] = NULL;
 

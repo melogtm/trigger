@@ -157,8 +157,10 @@ void test_glob_eligible_after_expansion() {
     while (expanded[count] != NULL) count++;
     ASSERT_EQUAL(4, count, "should have 4 entries");
 
-    for (int i = 0; i < 4; i++) {
-        ASSERT_TRUE(glob_eligible[i], "all expanded tokens should be glob_eligible=1");
+    ASSERT_TRUE(glob_eligible[0], "echo should keep original eligibility=1");
+
+    for (int i = 1; i < 4; i++) {
+        ASSERT_FALSE(glob_eligible[i], "glob-expanded filenames should be eligible=0");
     }
 
     free(glob_eligible);
