@@ -1,9 +1,9 @@
+#include "../include/input.h"
+#include "../src/utils/utils.h"
+#include "test_framework.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../include/input.h"
-#include "test_framework.h"
-#include "../src/utils/utils.h"
 
 void test_split_line_basic() {
     char *line = strdup("ls -la /home");
@@ -78,7 +78,8 @@ void test_split_line_double_quotes_basic() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should be 'hello world' (with space preserved)");
+    ASSERT_STR_EQUAL("hello world", tokens[1],
+                     "Second token should be 'hello world' (with space preserved)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -131,7 +132,8 @@ void test_split_line_double_quotes_concatenated() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("helloworldtest", tokens[1], "Second token should be 'helloworldtest' (concatenated)");
+    ASSERT_STR_EQUAL("helloworldtest", tokens[1],
+                     "Second token should be 'helloworldtest' (concatenated)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -146,7 +148,8 @@ void test_split_line_single_quotes_basic() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should be 'hello world' (with space preserved)");
+    ASSERT_STR_EQUAL("hello world", tokens[1],
+                     "Second token should be 'hello world' (with space preserved)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -172,7 +175,8 @@ void test_split_line_single_quotes_with_double_quotes() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("hello \"world\"", tokens[1], "Second token should preserve double quotes inside single quotes");
+    ASSERT_STR_EQUAL("hello \"world\"", tokens[1],
+                     "Second token should preserve double quotes inside single quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -200,7 +204,8 @@ void test_split_line_backslash_space() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("hello world", tokens[1], "Second token should be 'hello world' (escaped space)");
+    ASSERT_STR_EQUAL("hello world", tokens[1],
+                     "Second token should be 'hello world' (escaped space)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -293,7 +298,8 @@ void test_split_line_mixed_quotes() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("hello 'world'", tokens[1], "Second token should preserve single quotes in double quotes");
+    ASSERT_STR_EQUAL("hello 'world'", tokens[1],
+                     "Second token should preserve single quotes in double quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -306,7 +312,8 @@ void test_split_line_mixed_quotes_reversed() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("hello \"world\"", tokens[1], "Second token should preserve double quotes in single quotes");
+    ASSERT_STR_EQUAL("hello \"world\"", tokens[1],
+                     "Second token should preserve double quotes in single quotes");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -388,7 +395,8 @@ void test_split_line_backslash_at_end() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("echo", tokens[0], "First token should be 'echo'");
-    ASSERT_STR_EQUAL("test", tokens[1], "Second token should be 'test' (trailing backslash ignored or handled)");
+    ASSERT_STR_EQUAL("test", tokens[1],
+                     "Second token should be 'test' (trailing backslash ignored or handled)");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -414,7 +422,8 @@ void test_split_line_path_with_spaces() {
 
     ASSERT_NOT_NULL(tokens, "trigger_split_line should return non-NULL");
     ASSERT_STR_EQUAL("cd", tokens[0], "First token should be 'cd'");
-    ASSERT_STR_EQUAL("/home/user/my documents", tokens[1], "Second token should preserve path with spaces");
+    ASSERT_STR_EQUAL("/home/user/my documents", tokens[1],
+                     "Second token should preserve path with spaces");
     ASSERT_NULL(tokens[2], "Third token should be NULL");
 
     free_array_of_strings(tokens);
@@ -483,4 +492,3 @@ int main() {
 
     TEST_SUITE_END();
 }
-

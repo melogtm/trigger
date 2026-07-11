@@ -1,9 +1,9 @@
+#include "../include/builtins.h"
+#include "test_framework.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "../include/builtins.h"
-#include "test_framework.h"
 
 void test_builtin_arrays_match() {
     int count = trigger_num_builtins();
@@ -13,13 +13,20 @@ void test_builtin_arrays_match() {
     int found_cd = 0, found_help = 0, found_exit = 0;
     int found_pwd = 0, found_echo = 0, found_export = 0, found_unset = 0;
     for (int i = 0; i < count; i++) {
-        if (strcmp(builtin_str[i], "cd") == 0) found_cd = 1;
-        if (strcmp(builtin_str[i], "help") == 0) found_help = 1;
-        if (strcmp(builtin_str[i], "exit") == 0) found_exit = 1;
-        if (strcmp(builtin_str[i], "pwd") == 0) found_pwd = 1;
-        if (strcmp(builtin_str[i], "echo") == 0) found_echo = 1;
-        if (strcmp(builtin_str[i], "export") == 0) found_export = 1;
-        if (strcmp(builtin_str[i], "unset") == 0) found_unset = 1;
+        if (strcmp(builtin_str[i], "cd") == 0)
+            found_cd = 1;
+        if (strcmp(builtin_str[i], "help") == 0)
+            found_help = 1;
+        if (strcmp(builtin_str[i], "exit") == 0)
+            found_exit = 1;
+        if (strcmp(builtin_str[i], "pwd") == 0)
+            found_pwd = 1;
+        if (strcmp(builtin_str[i], "echo") == 0)
+            found_echo = 1;
+        if (strcmp(builtin_str[i], "export") == 0)
+            found_export = 1;
+        if (strcmp(builtin_str[i], "unset") == 0)
+            found_unset = 1;
     }
 
     ASSERT_TRUE(found_cd, "Should have 'cd' built-in");
@@ -136,4 +143,3 @@ int main() {
 
     TEST_SUITE_END();
 }
-

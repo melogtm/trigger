@@ -1,17 +1,16 @@
+#include "builtins.h"
+#include "utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "builtins.h"
-#include "utils/utils.h"
 
 char *builtin_str[] = {"cd", "help", "exit", "pwd", "echo", "export", "unset"};
 
-int (*builtin_func[])(char **) = {&trigger_cd, &trigger_help, &trigger_exit, &trigger_pwd, &trigger_echo, &trigger_export, &trigger_unset};
+int (*builtin_func[])(char **) = {&trigger_cd,   &trigger_help,   &trigger_exit, &trigger_pwd,
+                                  &trigger_echo, &trigger_export, &trigger_unset};
 
-int trigger_num_builtins(void) {
-    return sizeof(builtin_str) / sizeof(char *);
-}
+int trigger_num_builtins(void) { return sizeof(builtin_str) / sizeof(char *); }
 
 int trigger_cd(char **args) {
     if (args[1] == NULL) {
@@ -38,9 +37,7 @@ int trigger_help(char **args) {
     return true;
 }
 
-int trigger_exit(char **args) {
-    return EXIT_SUCCESS;
-}
+int trigger_exit(char **args) { return EXIT_SUCCESS; }
 
 int trigger_pwd(char **args) {
     char cwd[4096];

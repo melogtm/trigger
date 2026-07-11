@@ -1,8 +1,8 @@
+#include "glob_expand.h"
+#include <glob.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <glob.h>
-#include "glob_expand.h"
 
 static int has_metachars(const char *s) {
     return strchr(s, '*') != NULL || strchr(s, '?') != NULL || strchr(s, '[') != NULL;

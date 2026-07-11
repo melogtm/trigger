@@ -1,5 +1,7 @@
 # Trigger
 
+[![CI](https://github.com/melogtm/trigger/actions/workflows/ci.yml/badge.svg)](https://github.com/melogtm/trigger/actions/workflows/ci.yml)
+
 ## Overview
 
 This project aims to create a clean, efficient shell.

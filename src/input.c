@@ -1,8 +1,8 @@
+#include "input.h"
+#include "utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "input.h"
-#include "utils/utils.h"
 
 char *trigger_read_line(void) {
     char *line = NULL;
@@ -21,7 +21,7 @@ char *trigger_read_line(void) {
 }
 
 char **trigger_split_line(const char *line) {
-    char** tokens = parse_line_with_quotes(line, NULL);
+    char **tokens = parse_line_with_quotes(line, NULL);
 
     if (tokens == NULL) {
         return NULL;
@@ -31,7 +31,7 @@ char **trigger_split_line(const char *line) {
 }
 
 char **trigger_split_line_ex(const char *line, int **out_glob_eligible) {
-    char** tokens = parse_line_with_quotes(line, out_glob_eligible);
+    char **tokens = parse_line_with_quotes(line, out_glob_eligible);
 
     if (tokens == NULL) {
         if (out_glob_eligible != NULL) {
@@ -42,4 +42,3 @@ char **trigger_split_line_ex(const char *line, int **out_glob_eligible) {
 
     return tokens;
 }
-

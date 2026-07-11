@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cmake
+        run: sudo apt-get install -y cmake
+      - name: Build and test
+        run: ./run_tests.sh
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install lint tools
+        run: sudo apt-get install -y clang-format clang-tidy
+      - name: clang-format (dry-run)
+        run: |
+          clang-format --dry-run --Werror $(find src include tests -name '*.c' -o -name '*.h')
+      - name: Configure for clang-tidy
+        run: cmake -B cmake-build-debug -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: clang-tidy
+        run: |
+          clang-tidy -p cmake-build-debug $(find src include -name '*.c')

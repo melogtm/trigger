@@ -1,7 +1,7 @@
+#include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "utils.h"
 
 void free_array_of_strings(char **array) {
     if (array) {
@@ -31,9 +31,9 @@ void add_char_to_token(char **token_buffer, int *token_pos, int *token_size, con
     (*token_buffer)[(*token_pos)++] = c;
 }
 
-void finalize_token(char ***tokens_ptr, int *position, int *buffer_size,
-                    char **token_buffer, int *token_pos, int *token_size, int force,
-                    int **out_glob_eligible, int glob_eligible) {
+void finalize_token(char ***tokens_ptr, int *position, int *buffer_size, char **token_buffer,
+                    int *token_pos, int *token_size, int force, int **out_glob_eligible,
+                    int glob_eligible) {
     if (*token_pos > 0 || force) {
         char **tokens = *tokens_ptr;
 
@@ -76,78 +76,74 @@ void finalize_token(char ***tokens_ptr, int *position, int *buffer_size,
 }
 
 static void process_character(const char c, const char next_c, ParserState *state,
-                             char **token_buffer, int *token_pos, int *token_size,
-                             char ***tokens_ptr, int *position, int *buffer_size,
-                             int *skip_next, int *glob_eligible,
-                             int **out_glob_eligible) {
+                              char **token_buffer, int *token_pos, int *token_size,
+                              char ***tokens_ptr, int *position, int *buffer_size, int *skip_next,
+                              int *glob_eligible, int **out_glob_eligible) {
     *skip_next = 0;
 
     switch (*state) {
-        case STATE_NORMAL:
-            if (c == '\\') {
-                *state = STATE_ESCAPED;
-            } else if (c == '\'') {
-                *state = STATE_IN_SINGLE_QUOTE;
-            } else if (c == '"') {
-                *state = STATE_IN_DOUBLE_QUOTE;
-            } else if (is_whitespace(c)) {
-                finalize_token(tokens_ptr, position, buffer_size,
-                               token_buffer, token_pos, token_size, false,
-                               out_glob_eligible, *glob_eligible);
-                *glob_eligible = 1;
-            } else {
-                add_char_to_token(token_buffer, token_pos, token_size, c);
-            }
-            break;
+    case STATE_NORMAL:
+        if (c == '\\') {
+            *state = STATE_ESCAPED;
+        } else if (c == '\'') {
+            *state = STATE_IN_SINGLE_QUOTE;
+        } else if (c == '"') {
+            *state = STATE_IN_DOUBLE_QUOTE;
+        } else if (is_whitespace(c)) {
+            finalize_token(tokens_ptr, position, buffer_size, token_buffer, token_pos, token_size,
+                           false, out_glob_eligible, *glob_eligible);
+            *glob_eligible = 1;
+        } else {
+            add_char_to_token(token_buffer, token_pos, token_size, c);
+        }
+        break;
 
-        case STATE_ESCAPED:
+    case STATE_ESCAPED:
+        add_char_to_token(token_buffer, token_pos, token_size, c);
+        *glob_eligible = 0;
+        *state = STATE_NORMAL;
+        break;
+
+    case STATE_IN_SINGLE_QUOTE:
+        if (c == '\'') {
+            *state = STATE_NORMAL;
+            if (next_c == '\0' || is_whitespace(next_c)) {
+                finalize_token(tokens_ptr, position, buffer_size, token_buffer, token_pos,
+                               token_size, true, out_glob_eligible, *glob_eligible);
+                *glob_eligible = 1;
+            }
+        } else {
             add_char_to_token(token_buffer, token_pos, token_size, c);
             *glob_eligible = 0;
+        }
+        break;
+
+    case STATE_IN_DOUBLE_QUOTE:
+        if (c == '"') {
             *state = STATE_NORMAL;
-            break;
-
-        case STATE_IN_SINGLE_QUOTE:
-            if (c == '\'') {
-                *state = STATE_NORMAL;
-                if (next_c == '\0' || is_whitespace(next_c)) {
-                    finalize_token(tokens_ptr, position, buffer_size,
-                                 token_buffer, token_pos, token_size, true,
-                                 out_glob_eligible, *glob_eligible);
-                    *glob_eligible = 1;
-                }
+            if (next_c == '\0' || is_whitespace(next_c)) {
+                finalize_token(tokens_ptr, position, buffer_size, token_buffer, token_pos,
+                               token_size, true, out_glob_eligible, *glob_eligible);
+                *glob_eligible = 1;
+            }
+        } else if (c == '\\' && next_c != '\0') {
+            if (next_c == '"' || next_c == '\\' || next_c == '$' || next_c == ' ') {
+                add_char_to_token(token_buffer, token_pos, token_size, next_c);
+                *glob_eligible = 0;
+                *skip_next = true;
             } else {
                 add_char_to_token(token_buffer, token_pos, token_size, c);
                 *glob_eligible = 0;
             }
-            break;
-
-        case STATE_IN_DOUBLE_QUOTE:
-            if (c == '"') {
-                *state = STATE_NORMAL;
-                if (next_c == '\0' || is_whitespace(next_c)) {
-                    finalize_token(tokens_ptr, position, buffer_size,
-                                 token_buffer, token_pos, token_size, true,
-                                 out_glob_eligible, *glob_eligible);
-                    *glob_eligible = 1;
-                }
-            } else if (c == '\\' && next_c != '\0') {
-                if (next_c == '"' || next_c == '\\' || next_c == '$' || next_c == ' ') {
-                    add_char_to_token(token_buffer, token_pos, token_size, next_c);
-                    *glob_eligible = 0;
-                    *skip_next = true;
-                } else {
-                    add_char_to_token(token_buffer, token_pos, token_size, c);
-                    *glob_eligible = 0;
-                }
-            } else {
-                add_char_to_token(token_buffer, token_pos, token_size, c);
-                *glob_eligible = 0;
-            }
-            break;
+        } else {
+            add_char_to_token(token_buffer, token_pos, token_size, c);
+            *glob_eligible = 0;
+        }
+        break;
     }
 }
 
-char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
+char **parse_line_with_quotes(const char *line, int **out_glob_eligible) {
 
     int buffer_size = TRIGGER_TOK_BUFFER_SIZE;
     int position = 0;
@@ -189,10 +185,9 @@ char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
         int skip_next = false;
         const char next_char = line[i + 1];
 
-        process_character(line[i], next_char, &state,
-                         &token_buffer, &token_pos, &token_size,
-                         &tokens, &position, &buffer_size,
-                         &skip_next, &glob_eligible, pc_out_glob);
+        process_character(line[i], next_char, &state, &token_buffer, &token_pos, &token_size,
+                          &tokens, &position, &buffer_size, &skip_next, &glob_eligible,
+                          pc_out_glob);
 
         if (skip_next) {
             i++;
@@ -228,8 +223,7 @@ char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
         return NULL;
     }
 
-    finalize_token(&tokens, &position, &buffer_size,
-                   &token_buffer, &token_pos, &token_size, false,
+    finalize_token(&tokens, &position, &buffer_size, &token_buffer, &token_pos, &token_size, false,
                    pc_out_glob, glob_eligible);
 
     if (position >= buffer_size) {
@@ -256,4 +250,3 @@ char** parse_line_with_quotes(const char *line, int **out_glob_eligible) {
 
     return tokens;
 }
-
