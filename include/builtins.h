@@ -13,6 +13,7 @@ int trigger_pwd(char **args);
 int trigger_echo(char **args);
 int trigger_export(char **args);
 int trigger_unset(char **args);
+int trigger_nepeta(char **args);
 
 int trigger_num_builtins(void);
 const Builtin *find_builtin(const char *name);

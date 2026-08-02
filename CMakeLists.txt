@@ -11,6 +11,7 @@ set(LIB_SOURCES
         src/builtins.c
         src/pipeline.c
         src/glob.c
+        src/nepeta.c
 )
 
 set(UTIL_SOURCES
@@ -23,6 +24,7 @@ set(HEADERS
         include/builtins.h
         include/pipeline.h
         include/glob_expand.h
+        include/nepeta.h
 )
 
 add_library(trigger_core STATIC ${LIB_SOURCES} ${UTIL_SOURCES})
@@ -67,8 +69,13 @@ target_link_libraries(test_glob trigger_core)
 target_compile_options(test_glob PRIVATE -Wall -Wextra -Werror)
 add_test(NAME GlobTests COMMAND test_glob)
 
+add_executable(test_nepeta tests/test_nepeta.c)
+target_link_libraries(test_nepeta trigger_core)
+target_compile_options(test_nepeta PRIVATE -Wall -Wextra -Werror)
+add_test(NAME NepetaTests COMMAND test_nepeta)
+
 add_custom_target(run_tests
     COMMAND ${CMAKE_CTEST_COMMAND} --verbose
-    DEPENDS test_input test_builtins test_execute test_pipeline test_glob
+    DEPENDS test_input test_builtins test_execute test_pipeline test_glob test_nepeta
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
