@@ -7,14 +7,9 @@
 #include <unistd.h>
 
 static const Builtin builtins[] = {
-    {"cd", trigger_cd},
-    {"help", trigger_help},
-    {"exit", trigger_exit},
-    {"pwd", trigger_pwd},
-    {"echo", trigger_echo},
-    {"export", trigger_export},
-    {"unset", trigger_unset},
-    {"nepeta", trigger_nepeta},
+    {"cd", trigger_cd},       {"help", trigger_help},     {"exit", trigger_exit},
+    {"pwd", trigger_pwd},     {"echo", trigger_echo},     {"export", trigger_export},
+    {"unset", trigger_unset}, {"nepeta", trigger_nepeta},
 };
 
 static const int builtin_count = sizeof(builtins) / sizeof(builtins[0]);

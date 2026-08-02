@@ -32,9 +32,8 @@ typedef struct {
 } PunEntry;
 
 static const PunEntry pun_dict[] = {
-    {"for", "fur"},         {"perfect", "purrfect"}, {"great", "clawesome"},
-    {"awesome", "pawsome"}, {"friend", "furriend"},  {"now", "meow"},
-    {"help", "halp"},
+    {"for", "fur"},         {"perfect", "purrfect"}, {"great", "clawesome"}, {"awesome", "pawsome"},
+    {"friend", "furriend"}, {"now", "meow"},         {"help", "halp"},
 };
 
 static const size_t pun_count = sizeof(pun_dict) / sizeof(pun_dict[0]);
@@ -139,11 +138,11 @@ void trigger_nepeta_say(FILE *stream, const char *plain_text) {
 }
 
 static const char *quotes[] = {
-    ":33 < *ac scratches at the terminal prompt*",     ":33 < purractice makes purrfect! hehe",
-    ":33 < *pounces on the enter key* rawr!",          ":33 < this shell is the cat's pajamas!",
-    ":33 < *curls up on the keyboard* warm~",          ":33 < fur the glory of the hunt!",
-    ":33 < *chases the cursor with big kitty eyes*",   ":33 < all your base are belong to Nepeta!",
-    ":33 < *batbatbat* at the command line",           ":33 < meow is the time fur action!",
+    ":33 < *ac scratches at the terminal prompt*",   ":33 < purractice makes purrfect! hehe",
+    ":33 < *pounces on the enter key* rawr!",        ":33 < this shell is the cat's pajamas!",
+    ":33 < *curls up on the keyboard* warm~",        ":33 < fur the glory of the hunt!",
+    ":33 < *chases the cursor with big kitty eyes*", ":33 < all your base are belong to Nepeta!",
+    ":33 < *batbatbat* at the command line",         ":33 < meow is the time fur action!",
 };
 
 static const size_t quote_count = sizeof(quotes) / sizeof(quotes[0]);
