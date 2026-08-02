@@ -1,4 +1,5 @@
 #include "../include/builtins.h"
+#include "../include/nepeta.h"
 #include "test_framework.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +9,7 @@
 void test_builtin_arrays_match() {
     int count = trigger_num_builtins();
 
-    ASSERT_TRUE(count == 7, "Should have 7 built-in commands");
+    ASSERT_TRUE(count == 8, "Should have 8 built-in commands");
 
     ASSERT_NOT_NULL(find_builtin("cd"), "Should find 'cd' built-in");
     ASSERT_NOT_NULL(find_builtin("help"), "Should find 'help' built-in");
@@ -17,12 +18,17 @@ void test_builtin_arrays_match() {
     ASSERT_NOT_NULL(find_builtin("echo"), "Should find 'echo' built-in");
     ASSERT_NOT_NULL(find_builtin("export"), "Should find 'export' built-in");
     ASSERT_NOT_NULL(find_builtin("unset"), "Should find 'unset' built-in");
+    ASSERT_NOT_NULL(find_builtin("nepeta"), "Should find 'nepeta' built-in");
 
     ASSERT_NULL(find_builtin("nonexistent"), "Should not find unknown built-in");
 
     const Builtin *cd_b = find_builtin("cd");
     ASSERT_NOT_NULL(cd_b, "cd Builtin* should not be NULL");
     ASSERT_TRUE(cd_b->fn == trigger_cd, "cd Builtin should point to trigger_cd");
+
+    const Builtin *nepeta_b = find_builtin("nepeta");
+    ASSERT_NOT_NULL(nepeta_b, "nepeta Builtin* should not be NULL");
+    ASSERT_TRUE(nepeta_b->fn == trigger_nepeta, "nepeta Builtin should point to trigger_nepeta");
 }
 
 void test_cd_no_args() {
@@ -118,6 +124,50 @@ void test_unset_command() {
     ASSERT_NULL(getenv("UNSET_VAR"), "unset variable should not be available");
 }
 
+void test_nepeta_on() {
+    trigger_nepeta_set_enabled(false);
+    char *args[] = {"nepeta", "on", NULL};
+    int result = trigger_nepeta(args);
+    ASSERT_EQUAL(0, result, "nepeta on should return 0");
+    ASSERT_TRUE(trigger_nepeta_is_enabled(), "Nepeta should be enabled after 'nepeta on'");
+    trigger_nepeta_set_enabled(false);
+}
+
+void test_nepeta_off() {
+    trigger_nepeta_set_enabled(true);
+    char *args[] = {"nepeta", "off", NULL};
+    int result = trigger_nepeta(args);
+    ASSERT_EQUAL(0, result, "nepeta off should return 0");
+    ASSERT_FALSE(trigger_nepeta_is_enabled(), "Nepeta should be disabled after 'nepeta off'");
+    trigger_nepeta_set_enabled(false);
+}
+
+void test_nepeta_status() {
+    trigger_nepeta_set_enabled(false);
+    char *args[] = {"nepeta", "status", NULL};
+    int result = trigger_nepeta(args);
+    ASSERT_EQUAL(0, result, "nepeta status should return 0");
+    ASSERT_FALSE(trigger_nepeta_is_enabled(), "Nepeta should still be disabled after status");
+    trigger_nepeta_set_enabled(false);
+}
+
+void test_nepeta_bare_toggle() {
+    trigger_nepeta_set_enabled(false);
+    char *args[] = {"nepeta", NULL};
+    int result = trigger_nepeta(args);
+    ASSERT_EQUAL(0, result, "nepeta bare should return 0");
+    ASSERT_TRUE(trigger_nepeta_is_enabled(), "Nepeta should be enabled after bare toggle");
+    trigger_nepeta_set_enabled(false);
+}
+
+void test_nepeta_unknown_arg() {
+    trigger_nepeta_set_enabled(false);
+    char *args[] = {"nepeta", "meow", NULL};
+    int result = trigger_nepeta(args);
+    ASSERT_EQUAL(1, result, "nepeta with unknown arg should return 1");
+    ASSERT_FALSE(trigger_nepeta_is_enabled(), "Nepeta should stay disabled after unknown arg");
+}
+
 int main() {
     TEST_SUITE_START("Built-ins Module Tests");
 
@@ -133,6 +183,11 @@ int main() {
     test_export_command();
     test_export_no_value();
     test_unset_command();
+    test_nepeta_on();
+    test_nepeta_off();
+    test_nepeta_status();
+    test_nepeta_bare_toggle();
+    test_nepeta_unknown_arg();
 
     TEST_SUITE_END();
 }
