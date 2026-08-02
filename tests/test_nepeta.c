@@ -61,8 +61,7 @@ void test_translate_no_match_passthrough() {
 void test_translate_multiple_words() {
     reset_nepeta();
     char *t = trigger_nepeta_translate("this is great for a friend");
-    ASSERT_STR_EQUAL("this is clawesome fur a furriend", t,
-                     "Multiple words should all translate");
+    ASSERT_STR_EQUAL("this is clawesome fur a furriend", t, "Multiple words should all translate");
     free(t);
 }
 
