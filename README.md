@@ -6,6 +6,13 @@
 
 This project aims to create a clean, efficient shell.
 
+## Platforms
+
+Trigger targets POSIX systems: Linux and macOS are built and tested in CI, and tagged
+releases ship `trigger-linux-x86_64` and `trigger-macos-arm64` binaries. Windows is not
+supported natively (the shell relies on `fork`, `execvp`, `pipe` and `glob`); use WSL,
+MSYS2 or Cygwin there.
+
 ## Building
 
 ```bash

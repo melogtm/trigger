@@ -57,12 +57,13 @@ void test_execute_builtin_exit() {
 }
 
 void test_execute_external_command() {
-    char *words[] = {"/bin/true", NULL};
+    char *words[] = {"true", NULL};
     TokenList *tl = make_tokenlist(1, words);
     ExecuteResult r = trigger_execute(tl);
     free_tokenlist(tl);
 
-    ASSERT_FALSE(r.should_exit, "Execute '/bin/true' should not exit");
+    ASSERT_FALSE(r.should_exit, "Execute 'true' should not exit");
+    ASSERT_EQUAL(0, r.status, "Execute 'true' should return status 0");
 }
 
 void test_launch_simple_command() {

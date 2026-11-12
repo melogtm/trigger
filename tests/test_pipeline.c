@@ -172,7 +172,7 @@ void test_e2e_builtin_in_pipeline() {
     char cwd_before[4096];
     ASSERT_NOT_NULL(getcwd(cwd_before, sizeof(cwd_before)), "getcwd should succeed");
 
-    int result = run_command("cd /tmp | /bin/true");
+    int result = run_command("cd /tmp | true");
     ASSERT_TRUE(result, "cd in pipe should succeed");
 
     char cwd_after[4096];

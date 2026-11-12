@@ -9,11 +9,19 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: trigger-linux-x86_64
+          - os: macos-latest
+            asset: trigger-macos-arm64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Install cmake
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y cmake
@@ -21,8 +29,24 @@ jobs:
         run: |
           cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
           cmake --build build --target shell
+          cp build/shell ${{ matrix.asset }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: ${{ matrix.asset }}
+
+  # One publishing job so the matrix builds don't race to create the release
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/shell
+          files: |
+            trigger-linux-x86_64
+            trigger-macos-arm64
           generate_release_notes: true

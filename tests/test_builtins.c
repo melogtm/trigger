@@ -44,7 +44,11 @@ void test_cd_to_tmp() {
     ASSERT_NOT_NULL(getcwd(cwd_after, sizeof(cwd_after)), "getcwd after");
 
     ASSERT_EQUAL(0, result, "cd to /tmp should return 0");
-    ASSERT_STR_EQUAL("/tmp", cwd_after, "Should be in /tmp directory");
+    // /tmp is a symlink on macOS (/private/tmp), so compare against its resolved path
+    char *tmp_real = realpath("/tmp", NULL);
+    ASSERT_NOT_NULL(tmp_real, "realpath /tmp");
+    ASSERT_STR_EQUAL(tmp_real, cwd_after, "Should be in /tmp directory");
+    free(tmp_real);
 
     ASSERT_EQUAL(0, chdir(cwd_before), "chdir back");
 }
