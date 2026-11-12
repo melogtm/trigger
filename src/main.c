@@ -1,6 +1,5 @@
 #include "execute.h"
 #include "input.h"
-#include "nepeta.h"
 #include "utils/utils.h"
 #include <signal.h>
 #include <stdbool.h>
@@ -11,7 +10,7 @@ void trigger_loop(void) {
     int last_status = 0;
 
     for (;;) {
-        printf("%s", trigger_nepeta_prompt());
+        printf("> ");
         fflush(stdout);
         char *line = trigger_read_line();
         TokenList *tl = parse_line_with_quotes(line);
@@ -38,9 +37,6 @@ void trigger_loop(void) {
 int main(void) {
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, SIG_IGN);
-
-    trigger_nepeta_init_from_env();
-    trigger_nepeta_print_banner();
 
     trigger_loop();
 

@@ -33,12 +33,16 @@ Lint (also enforced in CI as a separate `lint` job, see below):
     cmake -B cmake-build-debug -S . -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
     clang-tidy -p cmake-build-debug -warnings-as-errors=* $(find src include -name '*.c')
 
-CI (`.github/workflows/ci.yml`) runs on every PR and push to `main` with two jobs:
-`build-and-test` (`./run_tests.sh`) and `lint` (clang-format + clang-tidy, both
-warnings-as-errors). Formatting follows `.clang-format` (LLVM base, 4-space indent,
-100 col limit); tidy checks are configured in `.clang-tidy`. A tag matching `v*.*.*`
-triggers `.github/workflows/release.yml`, which builds a Release binary and attaches
-it to a GitHub release.
+CI (`.github/workflows/ci.yml`) runs on every PR and push to `main` with three jobs:
+`build-and-test` (`./run_tests.sh` on both `ubuntu-latest` and `macos-latest`),
+`sanitize` (ASan/UBSan, Linux only) and `lint` (clang-format + clang-tidy, both
+warnings-as-errors). Tests must stay portable across Linux and macOS: don't hardcode
+binaries that differ between them (e.g. use `true`, not `/bin/true`), and remember that
+`/tmp` resolves to `/private/tmp` on macOS. Formatting follows `.clang-format` (LLVM
+base, 4-space indent, 100 col limit); tidy checks are configured in `.clang-tidy`. A tag matching `v*.*.*`
+triggers `.github/workflows/release.yml`, which builds Release binaries on Linux and
+macOS and attaches them to a GitHub release as `trigger-linux-x86_64` and
+`trigger-macos-arm64`.
 
 ## Architecture
 
